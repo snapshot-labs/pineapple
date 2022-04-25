@@ -3,7 +3,8 @@ import { Readable } from 'stream';
 
 let client;
 const region = process.env.AWS_REGION;
-if (region) client = new AWS.S3({ region });
+const endpoint = process.env.AWS_ENDPOINT || undefined;
+if (region) client = new AWS.S3({ region, endpoint });
 
 async function streamToString(stream: Readable): Promise<string> {
   return await new Promise((resolve, reject) => {
