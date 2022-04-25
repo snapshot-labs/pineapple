@@ -1,4 +1,5 @@
 import express from 'express';
+import Promise from 'bluebird';
 import { rpcError, rpcSuccess } from './utils';
 import { set as setPinata } from './pinata';
 import { set as setFleek } from './fleek';
