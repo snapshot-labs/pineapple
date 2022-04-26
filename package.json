@@ -13,7 +13,7 @@
     "@fleekhq/fleek-storage-js": "^1.0.21",
     "@pinata/sdk": "^1.1.23",
     "bluebird": "^3.7.2",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "eslint": "^6.7.2",
