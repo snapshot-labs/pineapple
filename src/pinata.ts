@@ -1,8 +1,13 @@
 import pinataSDK from '@pinata/sdk';
 
-const pinata = pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '');
+const provider = 'pinata';
+const client = pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '');
 
 export async function set(json) {
-  const result = await pinata.pinJSONToIPFS(json);
-  return result.IpfsHash;
+  const start = Date.now();
+  const result = await client.pinJSONToIPFS(json);
+  const cid = result.IpfsHash;
+  const ms = Date.now() - start;
+  console.log(cid, provider, ms);
+  return { cid, provider, ms };
 }
