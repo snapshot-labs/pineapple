@@ -16,6 +16,7 @@ router.post('/', async (req, res) => {
     const result = await Promise.any([setPinata(params), setFleek(params), setWeb3Storage(params)]);
     await setAws(result.cid, params);
     console.log('Success', result.provider, 'size', size);
+    result.size = size;
     return rpcSuccess(res, result, id);
   } catch (e) {
     console.log(e);
