@@ -5,6 +5,7 @@ let client;
 const region = process.env.AWS_REGION;
 const endpoint = process.env.AWS_ENDPOINT || undefined;
 if (region) client = new AWS.S3({ region, endpoint });
+const dir = 'pineapple';
 
 async function streamToString(stream: Readable): Promise<string> {
   return await new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ export async function set(key, value) {
   try {
     return await client.putObject({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/pineapple/${key}`,
+      Key: `public/${dir}/${key}`,
       Body: JSON.stringify(value),
       ContentType: 'application/json; charset=utf-8'
     });
@@ -33,7 +34,7 @@ export async function get(key) {
   try {
     const { Body } = await client.getObject({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `public/pineapple/${key}`
+      Key: `public/${dir}/${key}`
     });
     const str = await streamToString(Body);
     return JSON.parse(str);

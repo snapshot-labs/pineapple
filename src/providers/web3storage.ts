@@ -1,5 +1,5 @@
 import { Web3Storage, Blob, File } from 'web3.storage';
-import { sha256 } from './utils';
+import { sha256 } from '../utils';
 
 const provider = 'web3storage';
 const client = new Web3Storage({ token: process.env.WEB3STORAGE_API_TOKEN || '' });

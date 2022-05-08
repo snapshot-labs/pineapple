@@ -1,5 +1,5 @@
 import fleek from '@fleekhq/fleek-storage-js';
-import { sha256 } from './utils';
+import { sha256 } from '../utils';
 
 const provider = 'fleek';
 const config: any = {
