@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
   try {
     const size = Buffer.from(JSON.stringify(params)).length;
     if (size > 1e4) return rpcError(res, 500, 'too large', id);
-    const result = await Promise.any([setPinata(params), setFleek(params), setWeb3Storage(params)]);
+    const result = await Promise.any([setPinata(params), setFleek(params)]);
     await setAws(result.cid, params);
     console.log('Success', result.provider, 'size', size);
     result.size = size;
