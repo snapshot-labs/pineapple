@@ -1,5 +1,7 @@
 import { createHash } from 'crypto';
 
+export const MAX = 6e4;
+
 export function rpcSuccess(res, result, id) {
   res.json({
     jsonrpc: '2.0',
