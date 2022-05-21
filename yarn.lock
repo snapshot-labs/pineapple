@@ -976,10 +976,10 @@
   resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.5.5.tgz#315ab5745509d1a8c8e90d0bdf59823ccf9bcfc3"
   integrity sha512-sZ1W6gQzYnu45wPrWx8D3kwI2/U29VYTx9OjbDAd7jwRItJ0cSTMPRL/C8AWZFn9kWFLQGqEXVEE86w4Z8LpIQ==
 
-"@pinata/sdk@^1.1.23":
-  version "1.1.23"
-  resolved "https://registry.yarnpkg.com/@pinata/sdk/-/sdk-1.1.23.tgz#91d7e289a29f514ee35d8d2ad62f8ef891b57ea0"
-  integrity sha512-ZIQI6acEu2m3tuLW9UCUNVgqbHc5U+t657ukunamV0E8XcW639vgtGa5rd5C/9mVIxoWpp5CJ9q7FA1OT88huQ==
+"@pinata/sdk@^1.1.25":
+  version "1.1.25"
+  resolved "https://registry.yarnpkg.com/@pinata/sdk/-/sdk-1.1.25.tgz#1246347392d356abcb2eafeebe1b0717d0aefe88"
+  integrity sha512-juEeQQrSsm5MjCnqjF3tF/yuHQ3QemnJI8ML4f9ps7F7DjTnRNuvehdy14qEPcZX6XkOKrcifFVQX5AbNcp2+g==
   dependencies:
     axios "^0.21.1"
     base-path-converter "^1.0.2"
