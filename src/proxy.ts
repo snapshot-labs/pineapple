@@ -3,7 +3,7 @@ import fetch from 'cross-fetch';
 import Promise from 'bluebird';
 import gateways from './gateways.json';
 import { set, get } from './aws';
-import { sha256 } from './utils';
+import { MAX, sha256 } from './utils';
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.get('/ipfs/*', async (req, res) => {
     );
     res.json(json);
     const size = Buffer.from(JSON.stringify(json)).length;
-    if (size <= 1e4) await set(`cache/${key}`, json);
+    if (size <= MAX) await set(`cache/${key}`, json);
   } catch (e) {
     return res.status(500).json();
   }
