@@ -4,6 +4,7 @@ import cors from 'cors';
 import rpc from './rpc';
 import proxy from './proxy';
 import { version } from '../package.json';
+import { stats } from './stats';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +14,6 @@ app.use(express.urlencoded({ limit: '4mb', extended: false }));
 app.use(cors({ maxAge: 86400 }));
 app.use('/', rpc);
 app.use('/', proxy);
-app.get('/', (req, res) => res.json({ version, port: PORT }));
+app.get('/', (req, res) => res.json({ version, port: PORT, stats }));
 
 app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`));
