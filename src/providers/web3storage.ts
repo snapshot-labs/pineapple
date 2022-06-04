@@ -8,7 +8,7 @@ export async function set(json) {
   const start = Date.now();
   const blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
   const files = [new File([blob], sha256(JSON.stringify(json)))];
-  const cid = await client.put(files);
+  const cid = await client.put(files, { wrapWithDirectory: false });
   const ms = Date.now() - start;
   console.log(cid, provider, ms);
   return { cid, provider, ms };
