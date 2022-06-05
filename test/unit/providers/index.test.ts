@@ -22,6 +22,6 @@ describe('providers', () => {
 
       expect(result.provider).toBe(name);
       expect(result.cid).toBe(cid);
-    });
+    }, 10000);
   });
 });
