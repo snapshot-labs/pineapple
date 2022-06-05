@@ -1,15 +1,18 @@
 import pinataSDK from '@pinata/sdk';
-import { ReadStream } from 'fs';
-
+import { randomUUID } from 'crypto';
+import { Readable } from 'stream';
 const provider = 'pinata';
 const client = pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '');
 
-export async function set(data: ReadStream | object) {
+export async function set(data: Buffer | object) {
   const start = Date.now();
 
   let result;
-  if (data instanceof ReadStream) {
-    result = await client.pinFileToIPFS(data);
+  if (data instanceof Buffer) {
+    const stream = Readable.from(data);
+    // @ts-ignore
+    stream.path = randomUUID();
+    result = await client.pinFileToIPFS(stream);
   } else {
     result = await client.pinJSONToIPFS(data);
   }

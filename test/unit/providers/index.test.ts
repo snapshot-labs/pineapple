@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-
 import { set as setFleek } from '../../../src/providers/fleek';
 import { set as setInfura } from '../../../src/providers/infura';
 import { set as setPinata } from '../../../src/providers/pinata';
@@ -18,7 +17,7 @@ describe('providers', () => {
   };
 
   const image = {
-    input: path.join(__dirname, './fixtures/sample.webp'),
+    input: fs.promises.readFile(path.join(__dirname, './fixtures/sample.webp')),
     output: {
       v0: 'QmY4XQ2qvrRwEZWr918BCjbW35Q7WJ7rsYZsDB1f8fhk7K',
       v1: 'bafkreickll7k76ciher5vfsly6ew6awqfa7ix74zww4pqkrrvyzbjwvr2a'
@@ -39,7 +38,8 @@ describe('providers', () => {
     }, 10000);
 
     it('should upload an image file', async () => {
-      const result = await set(fs.createReadStream(image.input));
+      const buffer = await image.input;
+      const result = await set(buffer);
 
       expect(result.provider).toBe(name);
       expect(result.cid).toBe(image.output[idVersion]);

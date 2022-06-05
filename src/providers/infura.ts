@@ -1,4 +1,3 @@
-import { ReadStream } from 'fs';
 import { create } from 'ipfs-http-client';
 
 const { INFURA_PROJECT_ID: PROJECT_ID, INFURA_PROJECT_SECRET: PROJECT_SECRET } = process.env;
@@ -13,9 +12,9 @@ const client = create({
   }
 });
 
-export async function set(data: ReadStream | object) {
+export async function set(data: Buffer | object) {
   const start = Date.now();
-  const input = data instanceof ReadStream ? data : JSON.stringify(data);
+  const input = data instanceof Buffer ? data : JSON.stringify(data);
   const result = await client.add(input, {
     pin: true
   });

@@ -2,22 +2,27 @@ import fs from 'fs';
 import express from 'express';
 import Promise from 'bluebird';
 import multer from 'multer';
+import sharp from 'sharp';
 import { rpcError, rpcSuccess } from './utils';
 import { set as setFleek } from './providers/fleek';
 import { set as setPinata } from './providers/pinata';
 
+const MAX_INPUT_SIZE = 1024 * 1024;
+const MAX_IMAGE_DIMENSIONS = 500;
+
+const transformer = sharp()
+  .resize({ width: MAX_IMAGE_DIMENSIONS, height: MAX_IMAGE_DIMENSIONS, fit: 'inside' })
+  .webp({ lossless: true });
+
 const router = express.Router();
-
-const MAX_SIZE = 1024 * 1024;
-
-const upload = multer({ dest: 'uploads/', limits: { fileSize: MAX_SIZE } });
+const upload = multer({ dest: 'uploads/', limits: { fileSize: MAX_INPUT_SIZE } });
 
 router.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return rpcError(res, 500, 'no file', null);
 
   try {
-    const stream = fs.createReadStream(req.file.path);
-    const result = await Promise.any([setFleek(stream), setPinata(stream)]);
+    const buffer = await fs.createReadStream(req.file.path).pipe(transformer).toBuffer();
+    const result = await Promise.any([setFleek(buffer), setPinata(buffer)]);
     const file = {
       cid: result.cid,
       provider: result.provider
