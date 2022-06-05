@@ -1,5 +1,6 @@
+import { ReadStream } from 'fs';
 import fleek from '@fleekhq/fleek-storage-js';
-import { sha256 } from '../utils';
+import { sha256, streamToBuffer } from '../utils';
 
 const provider = 'fleek';
 const config: any = {
@@ -7,10 +8,10 @@ const config: any = {
   apiSecret: process.env.FLEEK_API_SECRET
 };
 
-export async function set(json) {
+export async function set(data: ReadStream | object) {
   const start = Date.now();
   const input = config;
-  input.data = JSON.stringify(json);
+  input.data = data instanceof ReadStream ? await streamToBuffer(data) : JSON.stringify(data);
   input.key = sha256(input.data);
   const result = await fleek.upload(input);
   const cid = result.hashV0;
