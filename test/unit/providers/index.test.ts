@@ -1,6 +1,5 @@
 import { set as setFleek } from '../../../src/providers/fleek';
 import { set as setInfura } from '../../../src/providers/infura';
-import { set as setPinata } from '../../../src/providers/pinata';
 import { set as setWeb3Storage } from '../../../src/providers/web3storage';
 
 describe('providers', () => {
@@ -16,7 +15,6 @@ describe('providers', () => {
   describe.each([
     { name: 'fleek', set: setFleek, cid: cid.v0 },
     { name: 'infura', set: setInfura, cid: cid.v0 },
-    { name: 'pinata', set: setPinata, cid: cid.v0 },
     { name: 'web3storage', set: setWeb3Storage, cid: cid.v1 }
   ])('$name', ({ name, set, cid }) => {
     it('should upload a file', async () => {
