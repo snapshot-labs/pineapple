@@ -4,13 +4,20 @@ on: [push]
 jobs:
   build-test:
     runs-on: ubuntu-20.04
+    env:
+      FLEEK_API_KEY: ${{ secrets.FLEEK_API_KEY }}
+      FLEEK_API_SECRET: ${{ secrets.FLEEK_API_SECRET }}
+      INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+      INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
+      PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+      PINATA_API_SECRET: ${{ secrets.PINATA_API_SECRET }}
+      WEB3STORAGE_API_TOKEN: ${{ secrets.WEB3STORAGE_API_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
           cache: 'yarn'
-      - run: env
       - run: yarn
       - run: yarn lint
       - run: yarn test
