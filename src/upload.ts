@@ -8,10 +8,10 @@ import { set as setFleek } from './providers/fleek';
 import { set as setPinata } from './providers/pinata';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
-const MAX_IMAGE_DIMENSIONS = 500;
+const MAX_IMAGE_DIMENSION = 500;
 
 const transformer = sharp()
-  .resize({ width: MAX_IMAGE_DIMENSIONS, height: MAX_IMAGE_DIMENSIONS, fit: 'inside' })
+  .resize({ width: MAX_IMAGE_DIMENSION, height: MAX_IMAGE_DIMENSION, fit: 'inside' })
   .webp({ lossless: true });
 
 const router = express.Router();
