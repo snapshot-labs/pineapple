@@ -11,10 +11,6 @@ import { set as setPinata } from './providers/pinata';
 const MAX_INPUT_SIZE = 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 500;
 
-const transformer = sharp()
-  .resize({ width: MAX_IMAGE_DIMENSION, height: MAX_IMAGE_DIMENSION, fit: 'inside' })
-  .webp({ lossless: true });
-
 const router = express.Router();
 const upload = multer({ dest: 'uploads/', limits: { fileSize: MAX_INPUT_SIZE } });
 
@@ -22,6 +18,10 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return rpcError(res, 500, 'no file', null);
 
   try {
+    const transformer = sharp()
+      .resize({ width: MAX_IMAGE_DIMENSION, height: MAX_IMAGE_DIMENSION, fit: 'inside' })
+      .webp({ lossless: true });
+
     const buffer = await fs.createReadStream(req.file.path).pipe(transformer).toBuffer();
     const result = await Promise.any([setFleek(buffer), setInfura(buffer), setPinata(buffer)]);
     const file = {
