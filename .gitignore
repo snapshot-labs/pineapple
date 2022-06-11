@@ -4,7 +4,7 @@ dist
 build
 .env
 coverage
-upload
+uploads
 
 # Remove some common IDE working directories
 .idea
