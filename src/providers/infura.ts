@@ -20,6 +20,6 @@ export async function set(data: Buffer | object) {
   });
   const cid = result.cid.toV0().toString();
   const ms = Date.now() - start;
-  console.log(cid, provider, ms);
+  // console.log(cid, provider, ms);
   return { cid, provider, ms };
 }
