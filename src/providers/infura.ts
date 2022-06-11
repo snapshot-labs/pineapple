@@ -12,9 +12,10 @@ const client = create({
   }
 });
 
-export async function set(json) {
+export async function set(data: Buffer | object) {
   const start = Date.now();
-  const result = await client.add(JSON.stringify(json), {
+  const input = data instanceof Buffer ? data : JSON.stringify(data);
+  const result = await client.add(input, {
     pin: true
   });
   const cid = result.cid.toV0().toString();

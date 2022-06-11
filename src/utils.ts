@@ -22,6 +22,6 @@ export function rpcError(res, code, e, id) {
   });
 }
 
-export function sha256(str) {
-  return createHash('sha256').update(str).digest('hex');
+export function sha256(input: string | Buffer) {
+  return createHash('sha256').update(input).digest('hex');
 }

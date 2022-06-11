@@ -7,10 +7,10 @@ const config: any = {
   apiSecret: process.env.FLEEK_API_SECRET
 };
 
-export async function set(json) {
+export async function set(data: Buffer | object) {
   const start = Date.now();
   const input = config;
-  input.data = JSON.stringify(json);
+  input.data = data instanceof Buffer ? data : JSON.stringify(data);
   input.key = sha256(input.data);
   const result = await fleek.upload(input);
   const cid = result.hashV0;
