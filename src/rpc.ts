@@ -13,7 +13,6 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { id, params } = req.body;
-  console.log(id, params)
   try {
     const size = Buffer.from(JSON.stringify(params)).length;
     if (size > MAX) return rpcError(res, 500, 'too large', id);
