@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
     await setAws(result.cid, params);
     stats.providers[result.provider] = (stats.providers[result.provider] || 0) + 1;
     stats.total += 1;
-    console.log('Success', result.provider, 'size', size);
+    console.log('Success', result.provider, 'size', size, 'ms', result.ms);
     result.size = size;
     return rpcSuccess(res, result, id);
   } catch (e) {
