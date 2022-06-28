@@ -23,7 +23,6 @@ router.post('/', async (req, res) => {
       setWeb3Storage(params),
       set4everland(params)
     ]);
-    // console.log(result)
     await setAws(result.cid, params);
     stats.providers[result.provider] = (stats.providers[result.provider] || 0) + 1;
     stats.total += 1;
