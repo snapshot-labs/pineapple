@@ -4,10 +4,10 @@ import Promise from 'bluebird';
 import multer from 'multer';
 import sharp from 'sharp';
 import { rpcError, rpcSuccess } from './utils';
-import { set as set4everland } from './providers/4everland';
 import { set as setFleek } from './providers/fleek';
 import { set as setInfura } from './providers/infura';
 import { set as setPinata } from './providers/pinata';
+import { set as set4everland } from './providers/4everland';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 500;
@@ -24,7 +24,12 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       .webp({ lossless: true });
 
     const buffer = await fs.createReadStream(req.file.path).pipe(transformer).toBuffer();
-    const result = await Promise.any([set4everland(buffer), setFleek(buffer), setInfura(buffer), setPinata(buffer)]);
+    const result = await Promise.any([
+      setFleek(buffer),
+      setInfura(buffer),
+      setPinata(buffer),
+      set4everland(buffer)
+    ]);
     const file = {
       cid: result.cid,
       provider: result.provider

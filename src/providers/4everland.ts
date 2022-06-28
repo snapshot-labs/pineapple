@@ -1,4 +1,4 @@
-import { S3 } from "@aws-sdk/client-s3";
+import { S3 } from '@aws-sdk/client-s3';
 import { sha256 } from '../utils';
 
 const provider = '4everland';
@@ -8,12 +8,12 @@ const config: any = {
   bucketName: process.env.EVER_BUCKET_NAME
 };
 const client = new S3({
-  endpoint: "https://endpoint.4everland.co",
-  region: "eu-west-2",
+  endpoint: 'https://endpoint.4everland.co',
+  region: 'eu-west-2',
   credentials: {
     accessKeyId: config.apiKey,
-    secretAccessKey: config.apiSecret,
-  },
+    secretAccessKey: config.apiSecret
+  }
 });
 
 export async function set(data: Buffer | object) {
@@ -23,7 +23,7 @@ export async function set(data: Buffer | object) {
   input.key = sha256(input.data);
   const params = {
     Bucket: config.bucketName,
-    Key: input.key,
+    Key: input.key
   };
   await client.putObject({
     ...params,
