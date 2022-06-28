@@ -18,16 +18,14 @@ const client = new S3({
 
 export async function set(data: Buffer | object) {
   const start = Date.now();
-  const input = config;
-  input.data = data instanceof Buffer ? data : JSON.stringify(data);
-  input.key = sha256(input.data);
+  const payload = data instanceof Buffer ? data : JSON.stringify(data);
   const params = {
     Bucket: config.bucketName,
-    Key: input.key
+    Key: sha256(payload)
   };
   await client.putObject({
     ...params,
-    Body: input.data,
+    Body: payload,
     ContentType: 'application/json; charset=utf-8'
   });
   const result = await client.headObject(params);
