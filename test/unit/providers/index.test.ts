@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { set as set4everland } from '../../../src/providers/4everland';
 import { set as setFleek } from '../../../src/providers/fleek';
 import { set as setInfura } from '../../../src/providers/infura';
 import { set as setPinata } from '../../../src/providers/pinata';
@@ -25,6 +26,7 @@ describe('providers', () => {
   };
 
   describe.each([
+    { name: '4everland', set: set4everland, idVersion: 'v1' },
     { name: 'fleek', set: setFleek, idVersion: 'v0' },
     { name: 'infura', set: setInfura, idVersion: 'v0' },
     { name: 'pinata', set: setPinata, idVersion: 'v0' },

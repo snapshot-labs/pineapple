@@ -5,6 +5,7 @@ import { set as setFleek } from './providers/fleek';
 import { set as setInfura } from './providers/infura';
 import { set as setPinata } from './providers/pinata';
 import { set as setWeb3Storage } from './providers/web3storage';
+import { set as set4everland } from './providers/4everland';
 import { set as setAws } from './aws';
 import { stats } from './stats';
 
@@ -19,8 +20,10 @@ router.post('/', async (req, res) => {
       setFleek(params),
       setInfura(params),
       setPinata(params),
-      setWeb3Storage(params)
+      setWeb3Storage(params),
+      set4everland(params)
     ]);
+    // console.log(result)
     await setAws(result.cid, params);
     stats.providers[result.provider] = (stats.providers[result.provider] || 0) + 1;
     stats.total += 1;
