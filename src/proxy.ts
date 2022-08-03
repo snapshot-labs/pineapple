@@ -13,9 +13,9 @@ router.get('/ipfs/*', async (req, res) => {
     const cache = await get(`cache/${key}`);
     if (cache) return res.json(cache);
     const json = await Promise.any(
-      gateways.map(gateway => {
+      gateways.map((gateway) => {
         const url = `https://${gateway}${req.originalUrl}`;
-        return fetch(url).then(res => res.json());
+        return fetch(url).then((res) => res.json());
       })
     );
     res.json(json);
