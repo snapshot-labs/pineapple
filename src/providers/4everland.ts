@@ -21,7 +21,7 @@ export async function set(data: Buffer | object) {
   await client.putObject({
     ...params,
     Body: payload,
-    ContentType: 'application/json; charset=utf-8'
+    ContentType: data instanceof Buffer ? null : 'application/json; charset=utf-8'
   });
   const result = await client.headObject(params);
   const cid = JSON.parse(result.ETag || 'null');
