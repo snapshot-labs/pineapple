@@ -10,7 +10,7 @@ import { set as setPinata } from './providers/pinata';
 import { set as set4everland } from './providers/4everland';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
-const MAX_IMAGE_DIMENSION = 1400;
+const MAX_IMAGE_DIMENSION = 1500;
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/', limits: { fileSize: MAX_INPUT_SIZE } });
