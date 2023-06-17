@@ -19,7 +19,6 @@ router.post('/', async (req, res) => {
     const result = await Promise.any([
       setFleek(params),
       setInfura(params),
-      setPinata(params),
       setWeb3Storage(params),
       set4everland(params)
     ]);
