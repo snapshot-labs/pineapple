@@ -4,6 +4,7 @@ import Promise from 'bluebird';
 import gateways from './gateways.json';
 import { set, get } from './aws';
 import { MAX, sha256 } from './utils';
+import { capture } from './sentry';
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.get('/ipfs/*', async (req, res) => {
     const size = Buffer.from(JSON.stringify(json)).length;
     if (size <= MAX) await set(`cache/${key}`, json);
   } catch (e) {
+    capture(e);
     return res.status(500).json();
   }
 });
