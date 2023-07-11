@@ -2,6 +2,10 @@ import * as Sentry from '@sentry/node';
 import type { Express } from 'express';
 
 export function initLogger(app: Express) {
+  if (process.env.NODE_ENV !== 'production') {
+    return;
+  }
+
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     integrations: [
