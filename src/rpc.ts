@@ -8,6 +8,7 @@ import { set as setWeb3Storage } from './providers/web3storage';
 import { set as set4everland } from './providers/4everland';
 import { set as setAws } from './aws';
 import { stats } from './stats';
+import { capture } from './sentry';
 
 const router = express.Router();
 
@@ -29,7 +30,7 @@ router.post('/', async (req, res) => {
     result.size = size;
     return rpcSuccess(res, result, id);
   } catch (e) {
-    console.log(e);
+    capture(e);
     return rpcError(res, 500, e, id);
   }
 });
