@@ -3,7 +3,6 @@ import Promise from 'bluebird';
 import { MAX, rpcError, rpcSuccess } from './utils';
 import { set as setFleek } from './providers/fleek';
 import { set as setInfura } from './providers/infura';
-import { set as setPinata } from './providers/pinata';
 import { set as setWeb3Storage } from './providers/web3storage';
 import { set as set4everland } from './providers/4everland';
 import { set as setAws } from './aws';

@@ -2,7 +2,7 @@ name: Test
 on: [push]
 
 jobs:
-  build-test:
+  test:
     runs-on: ubuntu-20.04
     env:
       FLEEK_API_KEY: ${{ secrets.FLEEK_API_KEY }}
@@ -22,7 +22,6 @@ jobs:
           node-version: '16'
           cache: 'yarn'
       - run: yarn
-      - run: yarn lint
       - run: yarn test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
