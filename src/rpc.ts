@@ -7,7 +7,7 @@ import { set as setWeb3Storage } from './providers/web3storage';
 import { set as set4everland } from './providers/4everland';
 import { set as setAws } from './aws';
 import { stats } from './stats';
-import { capture } from './sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 const router = express.Router();
 

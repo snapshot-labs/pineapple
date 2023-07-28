@@ -4,7 +4,7 @@ import Promise from 'bluebird';
 import gateways from './gateways.json';
 import { set, get } from './aws';
 import { MAX, sha256 } from './utils';
-import { capture } from './sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 const router = express.Router();
 

@@ -8,7 +8,7 @@ import { set as setFleek } from './providers/fleek';
 import { set as setInfura } from './providers/infura';
 import { set as setPinata } from './providers/pinata';
 import { set as set4everland } from './providers/4everland';
-import { capture } from './sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1500;
