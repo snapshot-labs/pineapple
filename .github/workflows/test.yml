@@ -1,5 +1,7 @@
 name: Test
+
 on: [push]
+
 env:
   FLEEK_API_KEY: ${{ secrets.FLEEK_API_KEY }}
   FLEEK_API_SECRET: ${{ secrets.FLEEK_API_SECRET }}
@@ -11,6 +13,7 @@ env:
   EVER_API_KEY: ${{ secrets.EVER_API_KEY }}
   EVER_API_SECRET: ${{ secrets.EVER_API_SECRET }}
   EVER_BUCKET_NAME: ${{ secrets.EVER_BUCKET_NAME }}
+
 jobs:
   test:
     uses: snapshot-labs/actions/.github/workflows/test.yml@main
