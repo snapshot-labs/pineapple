@@ -11,6 +11,9 @@ import { stats } from './stats';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const commit = process.env.COMMIT_HASH || '';
+const v = commit ? `${version}#${commit.substr(0, 7)}` : version;
+
 initLogger(app);
 
 app.use(express.json({ limit: '4mb' }));
@@ -19,7 +22,7 @@ app.use(cors({ maxAge: 86400 }));
 app.use('/', rpc);
 app.use('/', upload);
 app.use('/', proxy);
-app.get('/', (req, res) => res.json({ version, port: PORT, stats }));
+app.get('/', (req, res) => res.json({ version: v, port: PORT, stats }));
 
 fallbackLogger(app);
 
