@@ -20,8 +20,8 @@ const upload = multer({
 }).single('file');
 
 router.post('/upload', async (req, res) => {
-  try {
-    upload(req, res, async err => {
+  upload(req, res, async err => {
+    try {
       if (err) return rpcError(res, 500, err.message, null);
       if (!req.file) return rpcError(res, 500, 'no file', null);
 
@@ -37,6 +37,7 @@ router.post('/upload', async (req, res) => {
         .createReadStream(req.file?.path as string)
         .pipe(transformer)
         .toBuffer();
+
       const result = await Promise.any([
         setFleek(buffer),
         setInfura(buffer),
@@ -49,15 +50,18 @@ router.post('/upload', async (req, res) => {
       };
       console.log('Upload success', result.provider, result.cid);
       return rpcSuccess(res, file, null);
-    });
-  } catch (e) {
-    capture(e);
-    return rpcError(res, 500, e, null);
-  } finally {
-    if (req.file) {
-      await fs.promises.unlink(req.file.path as string);
+    } catch (e: any) {
+      if (e.message !== 'Input buffer contains unsupported image format') {
+        capture(e);
+      }
+
+      return rpcError(res, 500, e.message, null);
+    } finally {
+      if (req.file) {
+        await fs.promises.unlink(req.file.path as string);
+      }
     }
-  }
+  });
 });
 
 export default router;
