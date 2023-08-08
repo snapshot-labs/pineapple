@@ -17,39 +17,52 @@ const router = express.Router();
 const upload = multer({
   dest: 'uploads/',
   limits: { fileSize: MAX_INPUT_SIZE }
-});
+}).single('file');
 
-router.post('/upload', upload.single('file'), async (req, res) => {
-  if (!req.file) return rpcError(res, 500, 'no file', null);
+router.post('/upload', async (req, res) => {
+  upload(req, res, async err => {
+    try {
+      if (err) return rpcError(res, 400, err.message, null);
+      if (!req.file) return rpcError(res, 400, 'no file', null);
 
-  try {
-    const transformer = sharp()
-      .resize({
-        width: MAX_IMAGE_DIMENSION,
-        height: MAX_IMAGE_DIMENSION,
-        fit: 'inside'
-      })
-      .webp({ lossless: true });
+      const transformer = sharp()
+        .resize({
+          width: MAX_IMAGE_DIMENSION,
+          height: MAX_IMAGE_DIMENSION,
+          fit: 'inside'
+        })
+        .webp({ lossless: true });
 
-    const buffer = await fs.createReadStream(req.file.path).pipe(transformer).toBuffer();
-    const result = await Promise.any([
-      setFleek(buffer),
-      setInfura(buffer),
-      setPinata(buffer),
-      set4everland(buffer)
-    ]);
-    const file = {
-      cid: result.cid,
-      provider: result.provider
-    };
-    console.log('Upload success', result.provider, result.cid);
-    return rpcSuccess(res, file, null);
-  } catch (e) {
-    capture(e);
-    return rpcError(res, 500, e, null);
-  } finally {
-    await fs.promises.unlink(req.file.path);
-  }
+      const buffer = await fs
+        .createReadStream(req.file?.path as string)
+        .pipe(transformer)
+        .toBuffer();
+
+      const result = await Promise.any([
+        setFleek(buffer),
+        setInfura(buffer),
+        setPinata(buffer),
+        set4everland(buffer)
+      ]);
+      const file = {
+        cid: result.cid,
+        provider: result.provider
+      };
+      console.log('Upload success', result.provider, result.cid);
+      return rpcSuccess(res, file, null);
+    } catch (e: any) {
+      if (e.message === 'Input buffer contains unsupported image format') {
+        return rpcError(res, 415, 'Unsupported file type', null);
+      }
+
+      capture(e);
+      return rpcError(res, 500, e, null);
+    } finally {
+      if (req.file) {
+        await fs.promises.unlink(req.file.path as string);
+      }
+    }
+  });
 });
 
 export default router;
