@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
   const { id, params } = req.body;
   try {
     const size = Buffer.from(JSON.stringify(params)).length;
-    if (size > MAX) return rpcError(res, 500, 'too large', id);
+    if (size > MAX) return rpcError(res, 400, 'File too large', id);
     const result = await Promise.any([
       setFleek(params),
       setInfura(params),
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
     console.log('Success', result.provider, 'size', size, 'ms', result.ms);
     result.size = size;
     return rpcSuccess(res, result, id);
-  } catch (e) {
+  } catch (e: any) {
     capture(e);
     return rpcError(res, 500, e, id);
   }
