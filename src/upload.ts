@@ -22,8 +22,8 @@ const upload = multer({
 router.post('/upload', async (req, res) => {
   upload(req, res, async err => {
     try {
-      if (err) return rpcError(res, 400, err.message, null);
-      if (!req.file) return rpcError(res, 400, 'no file', null);
+      if (err) return rpcError(res, 400, err.message);
+      if (!req.file) return rpcError(res, 400, 'No file submitted');
 
       const transformer = sharp()
         .resize({
@@ -49,14 +49,14 @@ router.post('/upload', async (req, res) => {
         provider: result.provider
       };
       console.log('Upload success', result.provider, result.cid);
-      return rpcSuccess(res, file, null);
+      return rpcSuccess(res, file);
     } catch (e: any) {
       if (e.message === 'Input buffer contains unsupported image format') {
-        return rpcError(res, 415, 'Unsupported file type', null);
+        return rpcError(res, 415, 'Unsupported file type');
       }
 
       capture(e);
-      return rpcError(res, 500, e, null);
+      return rpcError(res, 500, e);
     } finally {
       if (req.file) {
         await fs.promises.unlink(req.file.path as string);

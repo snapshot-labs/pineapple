@@ -1,8 +1,9 @@
 import { createHash } from 'crypto';
+import { Response } from 'express';
 
 export const MAX = 10e4;
 
-export function rpcSuccess(res, result, id) {
+export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
     jsonrpc: '2.0',
     result,
@@ -10,13 +11,13 @@ export function rpcSuccess(res, result, id) {
   });
 }
 
-export function rpcError(res, code, e, id) {
+export function rpcError(res: Response, code: number, e: Error | string, id = null) {
   res.status(code).json({
     jsonrpc: '2.0',
     error: {
       code,
-      message: 'unauthorized',
-      data: e
+      message: e,
+      data: {}
     },
     id
   });

@@ -11,7 +11,7 @@ describe('GET /upload', () => {
         .attach('file', path.join(__dirname, './fixtures/too-heavy.jpg'));
 
       expect(response.statusCode).toBe(400);
-      expect(response.body.error.data).toContain('large');
+      expect(response.body.error.message).toBe('File too large');
     });
   });
 
@@ -25,7 +25,7 @@ describe('GET /upload', () => {
         .attach('file', path.join(__dirname, `./fixtures/${filename}`));
 
       expect(response.statusCode).toBe(415);
-      expect(response.body.error.data).toBe('Unsupported file type');
+      expect(response.body.error.message).toBe('Unsupported file type');
     });
   });
 
@@ -34,7 +34,7 @@ describe('GET /upload', () => {
       const response = await request(HOST).post('/upload');
 
       expect(response.statusCode).toBe(400);
-      expect(response.body.error.data).toBe('no file');
+      expect(response.body.error.message).toBe('No file submitted');
     });
   });
 
