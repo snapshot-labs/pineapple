@@ -12,7 +12,7 @@ export async function set(data: Buffer | object) {
     const stream = Readable.from(data);
     // @ts-ignore
     stream.path = randomUUID();
-    result = await client.pinFileToIPFS(stream, { pinataMetadata: { name: randomUUID() } });
+    result = await client.pinFileToIPFS(stream);
   } else {
     result = await client.pinJSONToIPFS(data);
   }
