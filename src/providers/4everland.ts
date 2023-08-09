@@ -1,13 +1,15 @@
 import { S3 } from '@aws-sdk/client-s3';
 import { sha256 } from '../utils';
 
-const provider = '4everland';
+const { EVER_API_KEY, EVER_API_SECRET } = process.env;
+
+export const provider = '4everland';
 const client = new S3({
   endpoint: 'https://endpoint.4everland.co',
   region: 'eu-west-2',
   credentials: {
-    accessKeyId: process.env.EVER_API_KEY || '',
-    secretAccessKey: process.env.EVER_API_SECRET || ''
+    accessKeyId: EVER_API_KEY || '',
+    secretAccessKey: EVER_API_SECRET || ''
   }
 });
 
@@ -28,4 +30,8 @@ export async function set(data: Buffer | object) {
   const ms = Date.now() - start;
   // console.log(cid, provider, ms);
   return { cid, provider, ms };
+}
+
+export function isConfigured() {
+  return EVER_API_KEY && EVER_API_SECRET;
 }

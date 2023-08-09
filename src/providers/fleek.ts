@@ -1,10 +1,12 @@
 import fleek from '@fleekhq/fleek-storage-js';
 import { sha256 } from '../utils';
 
-const provider = 'fleek';
+const { FLEEK_API_KEY, FLEEK_API_SECRET } = process.env;
+
+export const provider = 'fleek';
 const config: any = {
-  apiKey: process.env.FLEEK_API_KEY,
-  apiSecret: process.env.FLEEK_API_SECRET
+  apiKey: FLEEK_API_KEY,
+  apiSecret: FLEEK_API_SECRET
 };
 
 export async function set(data: Buffer | object) {
@@ -17,4 +19,8 @@ export async function set(data: Buffer | object) {
   const ms = Date.now() - start;
   // console.log(cid, provider, ms);
   return { cid, provider, ms };
+}
+
+export function isConfigured() {
+  return FLEEK_API_KEY && FLEEK_API_SECRET;
 }
