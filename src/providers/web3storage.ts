@@ -26,5 +26,5 @@ export async function set(data: Buffer | object) {
 }
 
 export function isConfigured() {
-  return WEB3STORAGE_API_TOKEN;
+  return !!WEB3STORAGE_API_TOKEN;
 }
