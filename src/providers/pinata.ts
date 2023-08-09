@@ -2,7 +2,7 @@ import pinataSDK from '@pinata/sdk';
 import { randomUUID } from 'crypto';
 import { Readable } from 'stream';
 const provider = 'pinata';
-const client = new pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '');
+const client = pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '');
 
 export async function set(data: Buffer | object) {
   const start = Date.now();
