@@ -3,13 +3,14 @@ import type { Express } from 'express';
 
 export default function initMetrics(app: Express) {
   init(app, {
-    normalizedPath: [
-      ['^/ipfs/.*', '/ipfs/#url'],
-    ],
-    whitelistedPath: [
-      /^\/$/,
-      /^\/upload$/,
-      /^\/ipfs\/.*$/,
-    ]
+    normalizedPath: [['^/ipfs/.*', '/ipfs/#url']],
+    whitelistedPath: [/^\/$/, /^\/upload$/, /^\/ipfs\/.*$/]
   });
 }
+
+export const timeProvidersUpload = new client.Histogram({
+  name: 'providers_upload_duration_seconds',
+  help: "Duration in seconds of provider's upload requests",
+  labelNames: ['name'],
+  buckets: [0.5, 1, 2, 5, 10, 15]
+});

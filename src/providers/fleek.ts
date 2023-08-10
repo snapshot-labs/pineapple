@@ -8,13 +8,11 @@ const config: any = {
 };
 
 export async function set(data: Buffer | object) {
-  const start = Date.now();
   const input = config;
   input.data = data instanceof Buffer ? data : JSON.stringify(data);
   input.key = sha256(input.data);
   const result = await fleek.upload(input);
   const cid = result.hashV0;
-  const ms = Date.now() - start;
 
-  return { cid, provider, ms };
+  return { cid, provider };
 }
