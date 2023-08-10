@@ -6,7 +6,6 @@ import rpc from './rpc';
 import upload from './upload';
 import proxy from './proxy';
 import { version } from '../package.json';
-import { stats } from './stats';
 import initMetrics from './metrics';
 
 const app = express();
@@ -24,7 +23,7 @@ app.use(cors({ maxAge: 86400 }));
 app.use('/', rpc);
 app.use('/', upload);
 app.use('/', proxy);
-app.get('/', (req, res) => res.json({ version: v, port: PORT, stats }));
+app.get('/', (req, res) => res.json({ version: v, port: PORT }));
 
 fallbackLogger(app);
 
