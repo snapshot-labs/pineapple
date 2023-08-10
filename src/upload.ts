@@ -3,12 +3,9 @@ import express from 'express';
 import Promise from 'bluebird';
 import multer from 'multer';
 import sharp from 'sharp';
-import { rpcError, rpcSuccess } from './utils';
-import { set as setFleek } from './providers/fleek';
-import { set as setInfura } from './providers/infura';
-import { set as setPinata } from './providers/pinata';
-import { set as set4everland } from './providers/4everland';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import { rpcError, rpcSuccess } from './utils';
+import { IMAGE_PROVIDERS, default as set } from './providers/';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1500;
@@ -38,12 +35,7 @@ router.post('/upload', async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await Promise.any([
-        setFleek(buffer),
-        setInfura(buffer),
-        setPinata(buffer),
-        set4everland(buffer)
-      ]);
+      const result = await Promise.any(set(IMAGE_PROVIDERS, buffer));
       const file = {
         cid: result.cid,
         provider: result.provider

@@ -15,6 +15,6 @@ export async function set(data: Buffer | object) {
   const result = await fleek.upload(input);
   const cid = result.hashV0;
   const ms = Date.now() - start;
-  // console.log(cid, provider, ms);
+
   return { cid, provider, ms };
 }

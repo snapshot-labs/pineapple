@@ -26,6 +26,6 @@ export async function set(data: Buffer | object) {
   const result = await client.headObject(params);
   const cid = JSON.parse(result.ETag || 'null');
   const ms = Date.now() - start;
-  // console.log(cid, provider, ms);
+
   return { cid, provider, ms };
 }

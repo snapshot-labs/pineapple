@@ -19,6 +19,6 @@ export async function set(data: Buffer | object) {
 
   const cid = result.IpfsHash;
   const ms = Date.now() - start;
-  // console.log(cid, provider, ms);
+
   return { cid, provider, ms };
 }

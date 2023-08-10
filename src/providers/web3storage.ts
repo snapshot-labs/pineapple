@@ -19,6 +19,6 @@ export async function set(data: Buffer | object) {
 
   const cid = await client.put([file], { wrapWithDirectory: false });
   const ms = Date.now() - start;
-  // console.log(cid, provider, ms);
+
   return { cid, provider, ms };
 }
