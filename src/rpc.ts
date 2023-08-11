@@ -13,6 +13,11 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { id, params } = req.body;
+
+  if (!params) {
+    return rpcError(res, 400, 'Malformed body', id);
+  }
+
   try {
     const size = Buffer.from(JSON.stringify(params)).length;
     if (size > MAX) return rpcError(res, 400, 'File too large', id);
@@ -22,7 +27,11 @@ router.post('/', async (req, res) => {
       setWeb3Storage(params),
       set4everland(params)
     ]);
-    await setAws(result.cid, params);
+    try {
+      await setAws(result.cid, params);
+    } catch (e: any) {
+      capture(e);
+    }
     stats.providers[result.provider] = (stats.providers[result.provider] || 0) + 1;
     stats.total += 1;
     console.log('Success', result.provider, 'size', size, 'ms', result.ms);

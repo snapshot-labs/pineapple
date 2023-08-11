@@ -1,14 +1,16 @@
 import { create } from 'ipfs-http-client';
 
-const { INFURA_PROJECT_ID: PROJECT_ID, INFURA_PROJECT_SECRET: PROJECT_SECRET } = process.env;
+const { INFURA_PROJECT_ID, INFURA_PROJECT_SECRET } = process.env;
 
-const provider = 'infura';
+export const provider = 'infura';
 const client = create({
   host: 'ipfs.infura.io',
   port: 5001,
   protocol: 'https',
   headers: {
-    authorization: `Basic ${Buffer.from(`${PROJECT_ID}:${PROJECT_SECRET}`).toString('base64')}`
+    authorization: `Basic ${Buffer.from(`${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`).toString(
+      'base64'
+    )}`
   }
 });
 
@@ -22,4 +24,8 @@ export async function set(data: Buffer | object) {
   const ms = Date.now() - start;
   // console.log(cid, provider, ms);
   return { cid, provider, ms };
+}
+
+export function isConfigured() {
+  return INFURA_PROJECT_ID && INFURA_PROJECT_SECRET;
 }
