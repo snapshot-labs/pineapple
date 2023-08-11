@@ -28,6 +28,12 @@ export const providersUploadSize = new client.Counter({
   labelNames: ['name']
 });
 
+const providersReturnCount = new client.Counter({
+  name: 'providers_return_count',
+  help: 'Number of times each provider have been used',
+  labelNames: ['name']
+});
+
 export const timeIpfsGatewaysResponse = new client.Histogram({
   name: 'ipfs_gateways_response_duration_seconds',
   help: "Duration in seconds of each IPFS gateway's reponse",
@@ -40,3 +46,16 @@ export const ipfsGatewaysReturnCount = new client.Counter({
   help: 'Number of times each gateway have been used',
   labelNames: ['name']
 });
+
+export const providersInstrumentation = (req, res, next) => {
+  const oldJson = res.json;
+  res.json = body => {
+    if (res.statusCode === 200 && body) {
+      providersReturnCount.inc({ name: body.result?.provider || body.provider });
+    }
+
+    res.locals.body = body;
+    return oldJson.call(res, body);
+  };
+  next();
+};

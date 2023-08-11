@@ -4,17 +4,18 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { MAX, rpcError, rpcSuccess } from './utils';
 import { set as setAws } from './aws';
 import { JSON_PROVIDERS, default as set } from './providers/';
+import { providersInstrumentation } from './metrics';
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', providersInstrumentation, async (req, res) => {
   const { id, params } = req.body;
   try {
     const size = Buffer.from(JSON.stringify(params)).length;
     if (size > MAX) return rpcError(res, 400, 'File too large', id);
     const result = await Promise.any(set(JSON_PROVIDERS, params));
     await setAws(result.cid, params);
-    console.log('Success', result.provider, 'size', size, 'ms', result.ms);
+    console.log('Success', result.provider, 'size', size);
     result.size = size;
     return rpcSuccess(res, result, id);
   } catch (e: any) {
