@@ -34,3 +34,9 @@ export const timeIpfsGatewaysResponse = new client.Histogram({
   labelNames: ['name'],
   buckets: [0.5, 1, 2, 5, 10, 15]
 });
+
+export const ipfsGatewaysReturnCount = new client.Counter({
+  name: 'ipfs_gateways_return_count',
+  help: 'Number of times each gateway have been used',
+  labelNames: ['name']
+});
