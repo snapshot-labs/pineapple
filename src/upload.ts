@@ -1,6 +1,5 @@
 import fs from 'fs';
 import express from 'express';
-import Promise from 'bluebird';
 import multer from 'multer';
 import sharp from 'sharp';
 import { rpcError, rpcSuccess } from './utils';
