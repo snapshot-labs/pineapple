@@ -1,8 +1,11 @@
 import pinataSDK from '@pinata/sdk';
 import { randomUUID } from 'crypto';
 import { Readable } from 'stream';
-const provider = 'pinata';
-const client = pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '');
+
+const { PINATA_API_KEY, PINATA_API_SECRET } = process.env;
+
+export const provider = 'pinata';
+const client = pinataSDK(PINATA_API_KEY || '', PINATA_API_SECRET || '');
 
 export async function set(data: Buffer | object) {
   let result;
@@ -18,4 +21,8 @@ export async function set(data: Buffer | object) {
   const cid = result.IpfsHash;
 
   return { cid, provider };
+}
+
+export function isConfigured() {
+  return PINATA_API_KEY && PINATA_API_SECRET;
 }

@@ -1,8 +1,10 @@
 import { Web3Storage, Blob, File } from 'web3.storage';
 import { sha256 } from '../utils';
 
-const provider = 'web3storage';
-const client = new Web3Storage({ token: process.env.WEB3STORAGE_API_TOKEN || '' });
+const { WEB3STORAGE_API_TOKEN } = process.env;
+
+export const provider = 'web3storage';
+const client = new Web3Storage({ token: WEB3STORAGE_API_TOKEN || '' });
 
 export async function set(data: Buffer | object) {
   let file;
@@ -18,4 +20,8 @@ export async function set(data: Buffer | object) {
   const cid = await client.put([file], { wrapWithDirectory: false });
 
   return { cid, provider };
+}
+
+export function isConfigured() {
+  return !!WEB3STORAGE_API_TOKEN;
 }
