@@ -12,7 +12,6 @@ const client = new S3({
 });
 
 export async function set(data: Buffer | object) {
-  const start = Date.now();
   const payload = data instanceof Buffer ? data : JSON.stringify(data);
   const params = {
     Bucket: process.env.EVER_BUCKET_NAME,
@@ -25,7 +24,6 @@ export async function set(data: Buffer | object) {
   });
   const result = await client.headObject(params);
   const cid = JSON.parse(result.ETag || 'null');
-  const ms = Date.now() - start;
 
-  return { cid, provider, ms };
+  return { cid, provider };
 }

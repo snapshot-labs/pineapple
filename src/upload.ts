@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { rpcError, rpcSuccess } from './utils';
 import { IMAGE_PROVIDERS, default as set } from './providers/';
+import { providersInstrumentation } from './metrics';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1500;
@@ -16,7 +17,7 @@ const upload = multer({
   limits: { fileSize: MAX_INPUT_SIZE }
 }).single('file');
 
-router.post('/upload', async (req, res) => {
+router.post('/upload', providersInstrumentation, async (req, res) => {
   upload(req, res, async err => {
     try {
       if (err) return rpcError(res, 400, err.message);
@@ -41,6 +42,7 @@ router.post('/upload', async (req, res) => {
         provider: result.provider
       };
       console.log('Upload success', result.provider, result.cid);
+
       return rpcSuccess(res, file);
     } catch (e: any) {
       if (e.message === 'Input buffer contains unsupported image format') {

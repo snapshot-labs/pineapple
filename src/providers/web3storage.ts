@@ -5,8 +5,6 @@ const provider = 'web3storage';
 const client = new Web3Storage({ token: process.env.WEB3STORAGE_API_TOKEN || '' });
 
 export async function set(data: Buffer | object) {
-  const start = Date.now();
-
   let file;
   if (data instanceof Buffer) {
     const blob = new Blob([data]);
@@ -18,7 +16,6 @@ export async function set(data: Buffer | object) {
   }
 
   const cid = await client.put([file], { wrapWithDirectory: false });
-  const ms = Date.now() - start;
 
-  return { cid, provider, ms };
+  return { cid, provider };
 }

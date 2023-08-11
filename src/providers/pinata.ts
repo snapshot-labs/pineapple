@@ -5,8 +5,6 @@ const provider = 'pinata';
 const client = pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '');
 
 export async function set(data: Buffer | object) {
-  const start = Date.now();
-
   let result;
   if (data instanceof Buffer) {
     const stream = Readable.from(data);
@@ -18,7 +16,6 @@ export async function set(data: Buffer | object) {
   }
 
   const cid = result.IpfsHash;
-  const ms = Date.now() - start;
 
-  return { cid, provider, ms };
+  return { cid, provider };
 }
