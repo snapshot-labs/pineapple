@@ -15,5 +15,6 @@ export default {
   testEnvironment: 'node',
   setupFiles: ['dotenv/config'],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/'],
-  moduleFileExtensions: ['js', 'ts']
+  moduleFileExtensions: ['js', 'ts'],
+  verbose: true
 };

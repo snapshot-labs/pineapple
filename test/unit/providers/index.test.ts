@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { set as setFleek } from '../../../src/providers/fleek';
-import { set as setInfura } from '../../../src/providers/infura';
-import { set as setPinata } from '../../../src/providers/pinata';
-import { set as setWeb3Storage } from '../../../src/providers/web3storage';
-import { set as set4everland } from '../../../src/providers/4everland';
+import * as Fleek from '../../../src/providers/fleek';
+import * as Infura from '../../../src/providers/infura';
+import * as Pinata from '../../../src/providers/pinata';
+import * as Web3Storage from '../../../src/providers/web3storage';
+import * as FourEverland from '../../../src/providers/4everland';
 
 describe('providers', () => {
   const json = {
@@ -25,19 +25,31 @@ describe('providers', () => {
     }
   };
 
-  describe.each([
-    { name: 'fleek', set: setFleek, idVersion: 'v0' },
-    { name: 'infura', set: setInfura, idVersion: 'v0' },
-    { name: 'pinata', set: setPinata, idVersion: 'v0' },
-    { name: 'web3storage', set: setWeb3Storage, idVersion: 'v1' },
-    { name: '4everland', set: set4everland, idVersion: 'v1' }
-  ])('$name', ({ name, set, idVersion }) => {
+  function buildProviderPayload(providers, version) {
+    return providers
+      .map(
+        p =>
+          p.isConfigured() && {
+            name: p.provider,
+            set: p.set,
+            idVersion: version
+          }
+      )
+      .filter(a => a);
+  }
+
+  const providerPayload: { name: string; set: any; idVersion: string }[] = buildProviderPayload(
+    [Fleek, Infura, Pinata],
+    'v0'
+  ).concat(buildProviderPayload([Web3Storage, FourEverland], 'v1'));
+
+  describe.each(providerPayload)('$name', ({ name, set, idVersion }) => {
     it('should upload a JSON file', async () => {
       const result = await set(json.input);
 
       expect(result.provider).toBe(name);
       expect(result.cid).toBe(json.output[idVersion]);
-    }, 10000);
+    }, 10e3);
 
     it('should upload an image file', async () => {
       const buffer = await image.input;
@@ -45,6 +57,6 @@ describe('providers', () => {
 
       expect(result.provider).toBe(name);
       expect(result.cid).toBe(image.output[idVersion]);
-    }, 10000);
+    }, 10e3);
   });
 });
