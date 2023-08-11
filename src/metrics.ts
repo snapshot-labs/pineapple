@@ -14,3 +14,9 @@ export const timeProvidersUpload = new client.Histogram({
   labelNames: ['name'],
   buckets: [0.5, 1, 2, 5, 10, 15]
 });
+
+export const providersUploadSize = new client.Counter({
+  name: 'providers_upload_size',
+  help: "Total size of each provider's upload file",
+  labelNames: ['name']
+});
