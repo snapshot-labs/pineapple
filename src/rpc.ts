@@ -34,8 +34,7 @@ router.post('/', async (req, res) => {
     stats.providers[result.provider] = (stats.providers[result.provider] || 0) + 1;
     stats.total += 1;
     console.log('Success', result.provider, 'size', size, 'ms', result.ms);
-    result.size = size;
-    return rpcSuccess(res, result, id);
+    return rpcSuccess(res, { ...result, size }, id);
   } catch (e: any) {
     capture(e);
     return rpcError(res, 500, e, id);
