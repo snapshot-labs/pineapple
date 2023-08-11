@@ -18,13 +18,15 @@ const providersMap = {
 };
 
 export default function uploadToProviders(providers: string[], params: any) {
-  return providers.map(async name => {
-    const end = timeProvidersUpload.startTimer({ name });
-    const result = await providersMap[name].set(params);
-    end();
+  return Promise.any(
+    providers.map(async name => {
+      const end = timeProvidersUpload.startTimer({ name });
+      const result = await providersMap[name].set(params);
+      end();
 
-    const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params))).length;
-    providersUploadSize.inc({ name }, size);
-    return result;
-  });
+      const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params))).length;
+      providersUploadSize.inc({ name }, size);
+      return result;
+    })
+  );
 }

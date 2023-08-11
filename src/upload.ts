@@ -1,6 +1,5 @@
 import fs from 'fs';
 import express from 'express';
-import Promise from 'bluebird';
 import multer from 'multer';
 import sharp from 'sharp';
 import { capture } from '@snapshot-labs/snapshot-sentry';
@@ -36,7 +35,7 @@ router.post('/upload', providersInstrumentation, async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await Promise.any(uploadToProviders(IMAGE_PROVIDERS, buffer));
+      const result = await uploadToProviders(IMAGE_PROVIDERS, buffer);
       const file = {
         cid: result.cid,
         provider: result.provider

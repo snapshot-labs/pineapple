@@ -1,5 +1,4 @@
 import express from 'express';
-import Promise from 'bluebird';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { MAX, rpcError, rpcSuccess } from './utils';
 import { set as setAws } from './aws';
@@ -19,7 +18,7 @@ router.post('/', providersInstrumentation, async (req, res) => {
     const size = Buffer.from(JSON.stringify(params)).length;
     if (size > MAX) return rpcError(res, 400, 'File too large', id);
 
-    const result = await Promise.any(uploadToProviders(JSON_PROVIDERS, params));
+    const result = await uploadToProviders(JSON_PROVIDERS, params);
     try {
       await setAws(result.cid, params);
     } catch (e: any) {
