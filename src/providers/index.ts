@@ -17,7 +17,7 @@ const providersMap = {
   '4everland': fourEverland
 };
 
-export default function set(providers: string[], params: any) {
+export default function uploadToProviders(providers: string[], params: any) {
   return providers.map(async name => {
     const end = timeProvidersUpload.startTimer({ name });
     const result = await providersMap[name].set(params);

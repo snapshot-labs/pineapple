@@ -5,7 +5,7 @@ import multer from 'multer';
 import sharp from 'sharp';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { rpcError, rpcSuccess } from './utils';
-import { IMAGE_PROVIDERS, default as set } from './providers/';
+import uploadToProviders, { IMAGE_PROVIDERS } from './providers/';
 import { providersInstrumentation } from './metrics';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
@@ -36,7 +36,7 @@ router.post('/upload', providersInstrumentation, async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await Promise.any(set(IMAGE_PROVIDERS, buffer));
+      const result = await Promise.any(uploadToProviders(IMAGE_PROVIDERS, buffer));
       const file = {
         cid: result.cid,
         provider: result.provider
