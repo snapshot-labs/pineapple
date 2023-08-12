@@ -15,15 +15,13 @@ const client = create({
 });
 
 export async function set(data: Buffer | object) {
-  const start = Date.now();
   const input = data instanceof Buffer ? data : JSON.stringify(data);
   const result = await client.add(input, {
     pin: true
   });
   const cid = result.cid.toV0().toString();
-  const ms = Date.now() - start;
-  // console.log(cid, provider, ms);
-  return { cid, provider, ms };
+
+  return { cid, provider };
 }
 
 export function isConfigured() {
