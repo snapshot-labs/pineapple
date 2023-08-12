@@ -8,8 +8,6 @@ export const provider = 'pinata';
 const client = pinataSDK(PINATA_API_KEY || '', PINATA_API_SECRET || '');
 
 export async function set(data: Buffer | object) {
-  const start = Date.now();
-
   let result;
   if (data instanceof Buffer) {
     const stream = Readable.from(data);
@@ -21,9 +19,8 @@ export async function set(data: Buffer | object) {
   }
 
   const cid = result.IpfsHash;
-  const ms = Date.now() - start;
-  // console.log(cid, provider, ms);
-  return { cid, provider, ms };
+
+  return { cid, provider };
 }
 
 export function isConfigured() {
