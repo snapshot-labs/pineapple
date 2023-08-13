@@ -4,7 +4,7 @@ import multer from 'multer';
 import sharp from 'sharp';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { rpcError, rpcSuccess } from './utils';
-import uploadToProviders, { IMAGE_PROVIDERS } from './providers/';
+import uploadToProviders, { IMAGE_PROVIDERS } from './providers';
 import { providersInstrumentation } from './metrics';
 
 const MAX_INPUT_SIZE = 1024 * 1024;

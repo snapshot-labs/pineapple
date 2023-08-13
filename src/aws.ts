@@ -1,5 +1,5 @@
-import * as AWS from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
+import * as AWS from '@aws-sdk/client-s3';
 
 let client;
 const region = process.env.AWS_REGION;
