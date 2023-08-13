@@ -7,4 +7,4 @@ jobs:
     uses: snapshot-labs/actions/.github/workflows/test.yml@inject-dotenv-content
     secrets: inherit
     with:
-      dotenv_vars: "WEB3STORAGE_API_TOKEN=${{ vars.JOB_NAME }}\nTEST2${{ vars.JOB_NAME }}\n"
+      dotenv_vars: "WEB3STORAGE_API_TOKEN=${{ $GITHUB_REPOSITORY }}\nTEST2=${{ $GITHUB_REPOSITORY }}\n"
