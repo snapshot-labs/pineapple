@@ -2,10 +2,10 @@ import 'dotenv/config';
 import express from 'express';
 import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 import cors from 'cors';
+import { version } from '../package.json';
 import rpc from './rpc';
 import upload from './upload';
 import proxy from './proxy';
-import { version } from '../package.json';
 import initMetrics from './metrics';
 
 const app = express();
