@@ -1,10 +1,29 @@
 name: Test
-
 on: [push]
 
 jobs:
   test:
-    uses: snapshot-labs/actions/.github/workflows/test.yml@inject-dotenv-content
-    secrets: inherit
-    with:
-      extract_env: SENTRY_PROJECT
+    runs-on: ubuntu-20.04
+    env:
+      FLEEK_API_KEY: ${{ secrets.FLEEK_API_KEY }}
+      FLEEK_API_SECRET: ${{ secrets.FLEEK_API_SECRET }}
+      INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+      INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
+      PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+      PINATA_API_SECRET: ${{ secrets.PINATA_API_SECRET }}
+      WEB3STORAGE_API_TOKEN: ${{ secrets.WEB3STORAGE_API_TOKEN }}
+      EVER_API_KEY: ${{ secrets.EVER_API_KEY }}
+      EVER_API_SECRET: ${{ secrets.EVER_API_SECRET }}
+      EVER_BUCKET_NAME: ${{ secrets.EVER_BUCKET_NAME }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
