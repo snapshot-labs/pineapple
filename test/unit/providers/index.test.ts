@@ -47,7 +47,7 @@ describe('providers', () => {
 
         expect(result.provider).toBe(name);
         expect(result.cid).toBe(json.output[idVersion]);
-      }, 10e3);
+      }, 20e3);
 
       it('should upload an image file', async () => {
         const buffer = await image.input;
@@ -55,7 +55,7 @@ describe('providers', () => {
 
         expect(result.provider).toBe(name);
         expect(result.cid).toBe(image.output[idVersion]);
-      }, 10e3);
+      }, 20e3);
     }
   });
 });
