@@ -1,6 +1,7 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { sha256, MAX } from '../utils';
 import { get, set } from '../aws';
+import { ipfsGatewaysCachePollCount } from '../metrics';
 
 export function cacheKey(key: string) {
   return sha256(key);
@@ -15,6 +16,7 @@ export default async function useProxyCache(req, res, next) {
 
   const cache = await get(`cache/${key}`);
   if (cache) {
+    ipfsGatewaysCachePollCount.inc({ status: 'HIT' });
     return res.json(cache);
   }
 
@@ -26,6 +28,7 @@ export default async function useProxyCache(req, res, next) {
       try {
         const size = Buffer.from(JSON.stringify(body)).length;
         if (size <= MAX) {
+          ipfsGatewaysCachePollCount.inc({ status: 'MISS' });
           await set(`cache/${key}`, body);
         }
       } catch (e) {
