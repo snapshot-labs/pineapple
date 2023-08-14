@@ -47,6 +47,18 @@ export const ipfsGatewaysReturnCount = new client.Counter({
   labelNames: ['name']
 });
 
+export const countOpenProvidersRequest = new client.Gauge({
+  name: 'providers_open_connections_count',
+  help: 'Number of open connections to providers',
+  labelNames: ['name']
+});
+
+export const countOpenGatewaysRequest = new client.Gauge({
+  name: 'ipfs_gateways_open_connections_count',
+  help: 'Number of open connections to gateways',
+  labelNames: ['name']
+});
+
 export const providersInstrumentation = (req, res, next) => {
   const oldJson = res.json;
   res.json = body => {

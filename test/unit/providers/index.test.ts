@@ -26,37 +26,36 @@ describe('providers', () => {
   };
 
   function buildProviderPayload(providers, version) {
-    return providers
-      .map(
-        p =>
-          p.isConfigured() && {
-            name: p.provider,
-            set: p.set,
-            idVersion: version
-          }
-      )
-      .filter(a => a);
+    return providers.map(p => ({
+      name: p.provider,
+      provider: p,
+      idVersion: version
+    }));
   }
 
-  const providerPayload: { name: string; set: any; idVersion: string }[] = buildProviderPayload(
-    [Fleek, Infura, Pinata],
-    'v0'
-  ).concat(buildProviderPayload([Web3Storage, FourEverland], 'v1'));
+  const providerPayload: { name: string; provider: any; idVersion: string }[] =
+    buildProviderPayload([Fleek, Infura, Pinata], 'v0').concat(
+      buildProviderPayload([Web3Storage, FourEverland], 'v1')
+    );
 
-  describe.each(providerPayload)('$name', ({ name, set, idVersion }) => {
-    it('should upload a JSON file', async () => {
-      const result = await set(json.input);
+  describe.each(providerPayload)('$name', ({ name, provider, idVersion }) => {
+    if (!provider.isConfigured()) {
+      it.todo(`needs to set credentials for ${name}`);
+    } else {
+      it('should upload a JSON file', async () => {
+        const result = await provider.set(json.input);
 
-      expect(result.provider).toBe(name);
-      expect(result.cid).toBe(json.output[idVersion]);
-    }, 10e3);
+        expect(result.provider).toBe(name);
+        expect(result.cid).toBe(json.output[idVersion]);
+      }, 20e3);
 
-    it('should upload an image file', async () => {
-      const buffer = await image.input;
-      const result = await set(buffer);
+      it('should upload an image file', async () => {
+        const buffer = await image.input;
+        const result = await provider.set(buffer);
 
-      expect(result.provider).toBe(name);
-      expect(result.cid).toBe(image.output[idVersion]);
-    }, 10e3);
+        expect(result.provider).toBe(name);
+        expect(result.cid).toBe(image.output[idVersion]);
+      }, 20e3);
+    }
   });
 });
