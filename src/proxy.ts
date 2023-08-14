@@ -3,18 +3,13 @@ import fetch from 'cross-fetch';
 import Promise from 'bluebird';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import gateways from './gateways.json';
-import { set, get } from './aws';
-import { MAX, sha256 } from './utils';
 import { ipfsGatewaysReturnCount, timeIpfsGatewaysResponse } from './metrics';
+import useCache from './middlewares/useCache';
 
 const router = express.Router();
 
-router.get('/ipfs/*', async (req, res) => {
-  const key = sha256(req.originalUrl);
+router.get('/ipfs/*', useCache, async (req, res) => {
   try {
-    const cache = await get(`cache/${key}`);
-    if (cache) return res.json(cache);
-
     const result = await Promise.any(
       gateways.map(async gateway => {
         const end = timeIpfsGatewaysResponse.startTimer({ name: gateway });
@@ -25,13 +20,6 @@ router.get('/ipfs/*', async (req, res) => {
       })
     );
     ipfsGatewaysReturnCount.inc({ name: result.gateway });
-
-    try {
-      const size = Buffer.from(JSON.stringify(result.json)).length;
-      if (size <= MAX) await set(`cache/${key}`, result.json);
-    } catch (e) {
-      capture(e);
-    }
 
     return res.json(result.json);
   } catch (e) {
