@@ -4,11 +4,11 @@ import Promise from 'bluebird';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import gateways from './gateways.json';
 import { ipfsGatewaysReturnCount, timeIpfsGatewaysResponse } from './metrics';
-import useCache from './middlewares/useCache';
+import useProxyCache from './middlewares/useProxyCache';
 
 const router = express.Router();
 
-router.get('/ipfs/*', useCache, async (req, res) => {
+router.get('/ipfs/*', useProxyCache, async (req, res) => {
   try {
     const result = await Promise.any(
       gateways.map(async gateway => {

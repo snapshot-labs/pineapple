@@ -2,7 +2,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { sha256, MAX } from '../utils';
 import { get, set } from '../aws';
 
-export default async function useCache(req, res, next) {
+export default async function useProxyCache(req, res, next) {
   const key = sha256(req.originalUrl);
 
   const cache = await get(`cache/${key}`);
