@@ -24,7 +24,6 @@
     "@pinata/sdk": "^1.1.25",
     "@snapshot-labs/snapshot-metrics": "^1.0.0",
     "@snapshot-labs/snapshot-sentry": "^1.0.0",
-    "bluebird": "^3.7.2",
     "cors": "^2.8.5",
     "cross-fetch": "^4.0.0",
     "dotenv": "^16.0.1",

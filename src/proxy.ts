@@ -1,6 +1,5 @@
 import express from 'express';
 import fetch from 'cross-fetch';
-import Promise from 'bluebird';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import gateways from './gateways.json';
 import {
