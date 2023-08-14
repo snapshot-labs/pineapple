@@ -24,10 +24,8 @@ router.post('/', providersInstrumentation, async (req, res) => {
     } catch (e: any) {
       capture(e);
     }
-    console.log('Success', result.provider, 'size', size);
 
-    result.size = size;
-    return rpcSuccess(res, result, id);
+    return rpcSuccess(res, { ...result, size }, id);
   } catch (e: any) {
     capture(e);
     return rpcError(res, 500, e, id);

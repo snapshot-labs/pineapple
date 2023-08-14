@@ -3,7 +3,7 @@ import request from 'supertest';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
-describe('GET /upload', () => {
+describe('POST /upload', () => {
   describe('when the image exceed the maximum file size', () => {
     it('returns a 400 error', async () => {
       const response = await request(HOST)
