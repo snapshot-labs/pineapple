@@ -42,3 +42,14 @@ export async function get(key) {
     return false;
   }
 }
+
+export async function remove(key) {
+  try {
+    return await client.deleteObject({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `public/${dir}/${key}`
+    });
+  } catch (e: any) {
+    return false;
+  }
+}

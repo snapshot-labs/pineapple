@@ -2,8 +2,16 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { sha256, MAX } from '../utils';
 import { get, set } from '../aws';
 
+export function cacheKey(key: string) {
+  return sha256(key);
+}
+
+/**
+ * This middleware serves a cache if it exists, else it will process the controller
+ * and caches its results if it's less than 1MB
+ */
 export default async function useProxyCache(req, res, next) {
-  const key = sha256(req.originalUrl);
+  const key = cacheKey(req.originalUrl);
 
   const cache = await get(`cache/${key}`);
   if (cache) {
