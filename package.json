@@ -24,6 +24,7 @@
     "@pinata/sdk": "^1.1.25",
     "@snapshot-labs/snapshot-metrics": "^1.0.0",
     "@snapshot-labs/snapshot-sentry": "^1.0.0",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.2",
