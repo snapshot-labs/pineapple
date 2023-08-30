@@ -2,10 +2,20 @@ import init, { client } from '@snapshot-labs/snapshot-metrics';
 import type { Express } from 'express';
 import gateways from './gateways.json';
 
+let server;
+
 export default function initMetrics(app: Express) {
   init(app, {
     normalizedPath: [['^/ipfs/.*', '/ipfs/#url']],
     whitelistedPath: [/^\/$/, /^\/upload$/, /^\/ipfs\/.*$/]
+  });
+
+  app.use((req, res, next) => {
+    if (!server) {
+      // @ts-ignore
+      server = req.socket.server;
+    }
+    next();
   });
 }
 
@@ -71,3 +81,13 @@ export const providersInstrumentation = (req, res, next) => {
   };
   next();
 };
+
+new client.Gauge({
+  name: 'express_open_connections_size',
+  help: 'Number of open connections on the express server',
+  async collect() {
+    if (server) {
+      this.set(server._connections);
+    }
+  }
+});
