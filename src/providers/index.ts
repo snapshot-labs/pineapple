@@ -6,7 +6,8 @@ export default function uploadToProviders(providers: string[], params: any) {
 
   return Promise.any(
     configuredProviders.map(async name => {
-      const end = timeProvidersUpload.startTimer({ name });
+      const type = params instanceof Buffer ? 'image' : 'json';
+      const end = timeProvidersUpload.startTimer({ name, type });
 
       try {
         countOpenProvidersRequest.inc({ name });
@@ -14,7 +15,6 @@ export default function uploadToProviders(providers: string[], params: any) {
         const result = await providersMap[name].set(params);
         const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
           .length;
-        const type = params instanceof Buffer ? 'image' : 'json';
         providersUploadSize.inc({ name, type }, size);
 
         return result;

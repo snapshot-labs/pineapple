@@ -41,7 +41,7 @@ providersImageCount.set(IMAGE_PROVIDERS.filter(p => providersMap[p].isConfigured
 export const timeProvidersUpload = new client.Histogram({
   name: 'providers_upload_duration_seconds',
   help: "Duration in seconds of provider's upload requests.",
-  labelNames: ['name'],
+  labelNames: ['name', 'type'],
   buckets: [0.5, 1, 2, 5, 10, 15]
 });
 
