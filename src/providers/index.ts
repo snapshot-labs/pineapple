@@ -14,7 +14,8 @@ export default function uploadToProviders(providers: string[], params: any) {
         const result = await providersMap[name].set(params);
         const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
           .length;
-        providersUploadSize.inc({ name }, size);
+        const type = params instanceof Buffer ? 'image' : 'json';
+        providersUploadSize.inc({ name, type }, size);
 
         return result;
       } finally {
