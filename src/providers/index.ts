@@ -2,8 +2,10 @@ import { timeProvidersUpload, providersUploadSize, countOpenProvidersRequest } f
 import { providersMap } from './utils';
 
 export default function uploadToProviders(providers: string[], params: any) {
+  const configuredProviders = providers.filter(p => providersMap[p].isConfigured());
+
   return Promise.any(
-    providers.map(async name => {
+    configuredProviders.map(async name => {
       const end = timeProvidersUpload.startTimer({ name });
 
       try {
