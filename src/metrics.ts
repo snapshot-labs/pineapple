@@ -1,6 +1,7 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import type { Express } from 'express';
 import gateways from './gateways.json';
+import { providersMap, IMAGE_PROVIDERS, JSON_PROVIDERS } from './providers/utils';
 
 let server;
 
@@ -24,6 +25,18 @@ const gatewaysCount = new client.Gauge({
   help: 'Number of IPFS gateways'
 });
 gatewaysCount.set(gateways.length);
+
+const providersJsonCount = new client.Gauge({
+  name: 'providers_json_count',
+  help: 'Number of providers used for JSON pinning.'
+});
+providersJsonCount.set(JSON_PROVIDERS.filter(p => providersMap[p].isConfigured()).length);
+
+const providersImageCount = new client.Gauge({
+  name: 'providers_image_count',
+  help: 'Number of providers used for image pinning.'
+});
+providersImageCount.set(IMAGE_PROVIDERS.filter(p => providersMap[p].isConfigured()).length);
 
 export const timeProvidersUpload = new client.Histogram({
   name: 'providers_upload_duration_seconds',

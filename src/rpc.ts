@@ -2,7 +2,8 @@ import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { MAX, rpcError, rpcSuccess } from './utils';
 import { set as setAws } from './aws';
-import uploadToProviders, { JSON_PROVIDERS } from './providers/';
+import uploadToProviders from './providers/';
+import { JSON_PROVIDERS } from './providers/utils';
 import { providersInstrumentation } from './metrics';
 
 const router = express.Router();
