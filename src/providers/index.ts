@@ -2,7 +2,7 @@ import { timeProvidersUpload, providersUploadSize, countOpenProvidersRequest } f
 import * as fleek from './fleek';
 import * as infura from './infura';
 import * as pinata from './pinata';
-import * as web3Storage from './web3storage';
+import * as web3storage from './web3storage';
 import * as fourEverland from './4everland';
 
 // List of providers used for pinning images
@@ -13,13 +13,15 @@ const providersMap = {
   fleek,
   infura,
   pinata,
-  web3Storage,
+  web3storage,
   '4everland': fourEverland
 };
 
 export default function uploadToProviders(providers: string[], params: any) {
+  const configuredProviders = providers.filter(p => providersMap[p].isConfigured());
+
   return Promise.any(
-    providers.map(async name => {
+    configuredProviders.map(async name => {
       const end = timeProvidersUpload.startTimer({ name });
 
       try {
