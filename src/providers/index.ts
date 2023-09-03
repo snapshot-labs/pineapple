@@ -1,10 +1,10 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { timeProvidersUpload, providersUploadSize, countOpenProvidersRequest } from '../metrics';
 import * as fleek from './fleek';
 import * as infura from './infura';
 import * as pinata from './pinata';
 import * as web3storage from './web3storage';
 import * as fourEverland from './4everland';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 // List of providers used for pinning images
 export const IMAGE_PROVIDERS = ['fleek', 'infura', 'pinata', '4everland'];
@@ -35,7 +35,7 @@ export default function uploadToProviders(providers: string[], params: any) {
 
         return result;
       } catch (e: any) {
-        capture(e);
+        capture(e, { name });
         throw e;
       } finally {
         end();
