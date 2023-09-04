@@ -1,3 +1,4 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { timeProvidersUpload, providersUploadSize, countOpenProvidersRequest } from '../metrics';
 import * as fleek from './fleek';
 import * as infura from './infura';
@@ -33,6 +34,9 @@ export default function uploadToProviders(providers: string[], params: any) {
         providersUploadSize.inc({ name }, size);
 
         return result;
+      } catch (e: any) {
+        capture(e, { name });
+        throw e;
       } finally {
         end();
         countOpenProvidersRequest.dec({ name });
