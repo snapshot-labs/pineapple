@@ -60,7 +60,7 @@ const providersReturnCount = new client.Counter({
 export const timeIpfsGatewaysResponse = new client.Histogram({
   name: 'ipfs_gateways_response_duration_seconds',
   help: "Duration in seconds of each IPFS gateway's reponse.",
-  labelNames: ['name'],
+  labelNames: ['name', 'status'],
   buckets: [0.5, 1, 2, 5, 10, 15]
 });
 
