@@ -18,6 +18,7 @@ export default function initMetrics(app: Express) {
     }
     next();
   });
+  app.use(providersInstrumentation);
 }
 
 const gatewaysCount = new client.Gauge({
@@ -54,7 +55,7 @@ export const providersUploadSize = new client.Counter({
 const providersReturnCount = new client.Counter({
   name: 'providers_return_count',
   help: 'Number of times each provider have been used.',
-  labelNames: ['name']
+  labelNames: ['name', 'type']
 });
 
 export const timeIpfsGatewaysResponse = new client.Histogram({
@@ -73,7 +74,7 @@ export const ipfsGatewaysReturnCount = new client.Counter({
 export const countOpenProvidersRequest = new client.Gauge({
   name: 'providers_open_connections_count',
   help: 'Number of open connections to providers.',
-  labelNames: ['name']
+  labelNames: ['name', 'type']
 });
 
 export const countOpenGatewaysRequest = new client.Gauge({
@@ -82,11 +83,22 @@ export const countOpenGatewaysRequest = new client.Gauge({
   labelNames: ['name']
 });
 
-export const providersInstrumentation = (req, res, next) => {
+const providersInstrumentation = (req, res, next) => {
+  let type;
+  if (req.method === 'POST' && req.originalUrl === '/') {
+    type = 'json';
+  } else if (req.method === 'POST' && req.originalUrl === '/upload') {
+    type = 'image';
+  }
+
+  if (!type) {
+    return next();
+  }
+
   const oldJson = res.json;
   res.json = body => {
     if (res.statusCode === 200 && body) {
-      providersReturnCount.inc({ name: body.result?.provider || body.provider });
+      providersReturnCount.inc({ name: body.result?.provider || body.provider, type });
     }
 
     res.locals.body = body;

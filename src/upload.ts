@@ -6,7 +6,6 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { rpcError, rpcSuccess } from './utils';
 import uploadToProviders from './providers/';
 import { IMAGE_PROVIDERS } from './providers/utils';
-import { providersInstrumentation } from './metrics';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1500;
@@ -17,7 +16,7 @@ const upload = multer({
   limits: { fileSize: MAX_INPUT_SIZE }
 }).single('file');
 
-router.post('/upload', providersInstrumentation, async (req, res) => {
+router.post('/upload', async (req, res) => {
   upload(req, res, async err => {
     try {
       if (err) return rpcError(res, 400, err.message);
@@ -36,7 +35,7 @@ router.post('/upload', providersInstrumentation, async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await uploadToProviders(IMAGE_PROVIDERS, buffer);
+      const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', buffer);
       const file = {
         cid: result.cid,
         provider: result.provider
