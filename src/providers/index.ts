@@ -21,7 +21,7 @@ export default function uploadToProviders(providers: string[], params: any) {
         return result;
       } catch (e: any) {
         capture(e, { name });
-        throw e;
+        return Promise.reject(e);
       } finally {
         end();
         countOpenProvidersRequest.dec({ name });
