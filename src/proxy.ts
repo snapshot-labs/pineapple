@@ -32,9 +32,20 @@ router.get('/ipfs/*', async (req, res) => {
           if (!response.ok) {
             return Promise.reject(response.status);
           }
-          status = 1;
 
-          return { gateway, json: await response.json() };
+          if (!['text/plain', 'application/json'].includes(response.headers.get('content-type'))) {
+            return Promise.reject('');
+          }
+
+          let json;
+          try {
+            json = await response.json();
+          } catch {
+            return Promise.reject('');
+          }
+
+          status = 1;
+          return { gateway, json };
         } finally {
           end({ status });
           countOpenGatewaysRequest.dec({ name: gateway });
