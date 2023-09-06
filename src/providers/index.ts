@@ -25,7 +25,7 @@ export default function uploadToProviders(providers: string[], type: ProviderTyp
       } catch (e: any) {
         if (e instanceof Error) {
           capture(e, { name });
-        } else {
+        } else if (e?.message !== 'Request timed out') {
           capture(new Error(`Error from ${name} provider`), {
             contexts: { provider_response: e }
           });
