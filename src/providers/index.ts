@@ -10,6 +10,7 @@ export default function uploadToProviders(providers: string[], type: ProviderTyp
     configuredProviders.map(async name => {
       const type: ProviderType = params instanceof Buffer ? 'image' : 'json';
       const end = timeProvidersUpload.startTimer({ name, type });
+      let status = 0;
 
       try {
         countOpenProvidersRequest.inc({ name, type });
@@ -18,13 +19,18 @@ export default function uploadToProviders(providers: string[], type: ProviderTyp
         const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
           .length;
         providersUploadSize.inc({ name, type }, size);
+        status = 1;
 
         return result;
       } catch (e: any) {
-        capture(e, { name });
-        throw e;
+        if (e instanceof Error) {
+          capture(e, { name });
+        } else {
+          capture('Error from provider', { contexts: { input: { name }, provider_response: e } });
+        }
+        return Promise.reject(e);
       } finally {
-        end();
+        end({ status });
         countOpenProvidersRequest.dec({ name, type });
       }
     })

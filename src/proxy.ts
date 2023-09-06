@@ -21,6 +21,7 @@ router.get('/ipfs/*', async (req, res) => {
     const result = await Promise.any(
       gateways.map(async gateway => {
         const end = timeIpfsGatewaysResponse.startTimer({ name: gateway });
+        let status = 0;
 
         try {
           countOpenGatewaysRequest.inc({ name: gateway });
@@ -31,10 +32,11 @@ router.get('/ipfs/*', async (req, res) => {
           if (!response.ok) {
             return Promise.reject(response.status);
           }
+          status = 1;
 
           return { gateway, json: await response.json() };
         } finally {
-          end();
+          end({ status });
           countOpenGatewaysRequest.dec({ name: gateway });
         }
       })
