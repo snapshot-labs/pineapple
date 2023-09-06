@@ -23,7 +23,11 @@ export default function uploadToProviders(providers: string[], type: ProviderTyp
 
         return result;
       } catch (e: any) {
-        capture(e, { name });
+        if (e instanceof Error) {
+          capture(e, { name });
+        } else {
+          capture('Error from provider', { contexts: { input: { name }, provider_response: e } });
+        }
         return Promise.reject(e);
       } finally {
         end({ status });
