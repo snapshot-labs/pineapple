@@ -8,6 +8,7 @@ if (region) client = new AWS.S3({ region, endpoint });
 const dir = 'pineapple';
 
 async function streamToString(stream: Readable): Promise<string> {
+  if (!client) return '';
   return await new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
     stream.on('data', chunk => chunks.push(chunk));
@@ -17,6 +18,7 @@ async function streamToString(stream: Readable): Promise<string> {
 }
 
 export async function set(key, value) {
+  if (!client) return;
   try {
     return await client.putObject({
       Bucket: process.env.AWS_BUCKET_NAME,
@@ -31,6 +33,7 @@ export async function set(key, value) {
 }
 
 export async function get(key) {
+  if (!client) return false;
   try {
     const { Body } = await client.getObject({
       Bucket: process.env.AWS_BUCKET_NAME,
