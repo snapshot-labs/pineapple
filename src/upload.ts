@@ -40,7 +40,6 @@ router.post('/upload', async (req, res) => {
         cid: result.cid,
         provider: result.provider
       };
-      console.log('Upload success', result.provider, result.cid);
 
       return rpcSuccess(res, file);
     } catch (e: any) {
