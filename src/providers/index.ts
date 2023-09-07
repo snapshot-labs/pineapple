@@ -25,8 +25,10 @@ export default function uploadToProviders(providers: string[], type: ProviderTyp
       } catch (e: any) {
         if (e instanceof Error) {
           capture(e, { name });
-        } else {
-          capture('Error from provider', { contexts: { input: { name }, provider_response: e } });
+        } else if (e?.message !== 'Request timed out') {
+          capture(new Error(`Error from ${name} provider`), {
+            contexts: { provider_response: e }
+          });
         }
         return Promise.reject(e);
       } finally {
