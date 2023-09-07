@@ -8,7 +8,6 @@ if (region) client = new AWS.S3({ region, endpoint });
 const dir = 'pineapple';
 
 async function streamToString(stream: Readable): Promise<string> {
-  if (!client) return '';
   return await new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
     stream.on('data', chunk => chunks.push(chunk));
