@@ -19,7 +19,7 @@ describe('GET /ipfs/*', () => {
       );
 
       expect(response.statusCode).toBe(400);
-    });
+    }, 15e3);
   });
 
   describe('when the IPFS cid does not exist', () => {
