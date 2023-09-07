@@ -17,6 +17,7 @@ async function streamToString(stream: Readable): Promise<string> {
 }
 
 export async function set(key, value) {
+  if (!client) return;
   try {
     return await client.putObject({
       Bucket: process.env.AWS_BUCKET_NAME,
@@ -31,6 +32,7 @@ export async function set(key, value) {
 }
 
 export async function get(key) {
+  if (!client) return false;
   try {
     const { Body } = await client.getObject({
       Bucket: process.env.AWS_BUCKET_NAME,
