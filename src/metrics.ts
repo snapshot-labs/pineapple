@@ -8,7 +8,7 @@ export default function initMetrics(app: Express) {
   init(app, {
     normalizedPath: [['^/ipfs/.*', '/ipfs/#url']],
     whitelistedPath: [/^\/$/, /^\/upload$/, /^\/ipfs\/.*$/],
-    errorHandler: (e: any) => capture(e)
+    errorHandler: capture
   });
 
   app.use(providersInstrumentation);
