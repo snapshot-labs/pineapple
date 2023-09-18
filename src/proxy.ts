@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import gateways from './gateways.json';
 import { set, get } from './aws';
-import { MAX, sha256 } from './utils';
+import { MAX } from './utils';
 import {
   ipfsGatewaysReturnCount,
   timeIpfsGatewaysResponse,
@@ -12,10 +12,10 @@ import {
 
 const router = express.Router();
 
-router.get('/ipfs/*', async (req, res) => {
-  const key = sha256(req.originalUrl);
+router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', async (req, res) => {
+  const { cid } = req.params;
   try {
-    const cache = await get(`cache/${key}`);
+    const cache = await get(cid);
     if (cache) return res.json(cache);
 
     const result = await Promise.any(
@@ -56,7 +56,7 @@ router.get('/ipfs/*', async (req, res) => {
 
     try {
       const size = Buffer.from(JSON.stringify(result.json)).length;
-      if (size <= MAX) await set(`cache/${key}`, result.json);
+      if (size <= MAX) await set(cid, result.json);
     } catch (e) {
       capture(e);
     }
