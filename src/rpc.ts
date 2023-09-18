@@ -1,6 +1,6 @@
 import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { MAX, rpcError, rpcSuccess, sha256 } from './utils';
+import { MAX, rpcError, rpcSuccess } from './utils';
 import { set as setAws } from './aws';
 import uploadToProviders from './providers/';
 import { JSON_PROVIDERS } from './providers/utils';
@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
 
     const result = await uploadToProviders(JSON_PROVIDERS, 'json', params);
     try {
-      await setAws(`cache/${sha256(result.cid)}`, params);
+      await setAws(result.cid, params);
     } catch (e: any) {
       capture(e);
     }
