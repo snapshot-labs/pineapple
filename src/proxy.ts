@@ -12,10 +12,10 @@ import {
 
 const router = express.Router();
 
-router.get('^/ipfs/:key([0-9a-zA-Z]+)$', async (req, res) => {
-  const { key } = req.params;
+router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', async (req, res) => {
+  const { cid } = req.params;
   try {
-    const cache = await get(key);
+    const cache = await get(cid);
     if (cache) return res.json(cache);
 
     const result = await Promise.any(
@@ -56,7 +56,7 @@ router.get('^/ipfs/:key([0-9a-zA-Z]+)$', async (req, res) => {
 
     try {
       const size = Buffer.from(JSON.stringify(result.json)).length;
-      if (size <= MAX) await set(key, result.json);
+      if (size <= MAX) await set(cid, result.json);
     } catch (e) {
       capture(e);
     }
