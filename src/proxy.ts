@@ -12,8 +12,8 @@ import {
 
 const router = express.Router();
 
-router.get(/^\/ipfs\/\w+$/, async (req, res) => {
-  const key = req.originalUrl;
+router.get('^/ipfs/:key([0-9a-zA-Z]+)$', async (req, res) => {
+  const { key } = req.params;
   try {
     const cache = await get(key);
     if (cache) return res.json(cache);
