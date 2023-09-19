@@ -39,7 +39,7 @@ describe('POST /upload', () => {
   });
 
   describe('when the file is correct', () => {
-    it('uploads the file and returns a JSO-RPC response with the CID and its provider', async () => {
+    it('uploads the file and returns a JSON-RPC response with the CID and its provider', async () => {
       const response = await request(HOST)
         .post('/upload')
         .attach('file', path.join(__dirname, './fixtures/valid.png'));

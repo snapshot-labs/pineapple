@@ -1,20 +1,16 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { sha256, MAX } from '../utils';
+import { MAX } from '../utils';
 import { get, set } from '../aws';
 import { ipfsGatewaysCacheHitCount, ipfsGatewaysCacheSize } from '../metrics';
-
-export function cacheKey(key: string) {
-  return sha256(key);
-}
 
 /**
  * This middleware serves a cache if it exists, else it will process the controller
  * and caches its results if it's less than 1MB
  */
 export default async function useProxyCache(req, res, next) {
-  const key = cacheKey(req.originalUrl);
+  const { cid } = req.params;
 
-  const cache = await get(`cache/${key}`);
+  const cache = await get(cid);
   if (cache) {
     const cachedSize = Buffer.from(JSON.stringify(cache)).length;
     ipfsGatewaysCacheHitCount.inc({ status: 'HIT' });
@@ -32,7 +28,7 @@ export default async function useProxyCache(req, res, next) {
         if (size <= MAX) {
           ipfsGatewaysCacheHitCount.inc({ status: 'MISS' });
           ipfsGatewaysCacheSize.inc({ status: 'MISS' }, size);
-          await set(`cache/${key}`, body);
+          await set(cid, body);
         }
       } catch (e) {
         capture(e);
