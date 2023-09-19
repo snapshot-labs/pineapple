@@ -1,39 +1,41 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { timeProvidersUpload, providersUploadSize, countOpenProvidersRequest } from '../metrics';
-import * as fleek from './fleek';
-import * as infura from './infura';
-import * as pinata from './pinata';
-import * as web3Storage from './web3storage';
-import * as fourEverland from './4everland';
+import { providersMap } from './utils';
+type ProviderType = 'image' | 'json';
 
-// List of providers used for pinning images
-export const IMAGE_PROVIDERS = ['fleek', 'infura', 'pinata', '4everland'];
-// List of providers used for pinning json
-export const JSON_PROVIDERS = ['fleek', 'infura', 'web3storage', '4everland'];
-const providersMap = {
-  fleek,
-  infura,
-  pinata,
-  web3Storage,
-  '4everland': fourEverland
-};
+export default function uploadToProviders(providers: string[], type: ProviderType, params: any) {
+  const configuredProviders = providers.filter(p => providersMap[p].isConfigured());
 
-export default function uploadToProviders(providers: string[], params: any) {
   return Promise.any(
-    providers.map(async name => {
-      const end = timeProvidersUpload.startTimer({ name });
+    configuredProviders.map(async name => {
+      const type: ProviderType = params instanceof Buffer ? 'image' : 'json';
+      const end = timeProvidersUpload.startTimer({ name, type });
+      let status = 0;
 
       try {
-        countOpenProvidersRequest.inc({ name });
+        countOpenProvidersRequest.inc({ name, type });
 
         const result = await providersMap[name].set(params);
         const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
           .length;
-        providersUploadSize.inc({ name }, size);
+        providersUploadSize.inc({ name, type }, size);
+        status = 1;
 
         return result;
+      } catch (e: any) {
+        if (e instanceof Error) {
+          if (e.message !== 'Request timed out') {
+            capture(e, { name });
+          }
+        } else {
+          capture(new Error(`Error from ${name} provider`), {
+            contexts: { provider_response: e }
+          });
+        }
+        return Promise.reject(e);
       } finally {
-        end();
-        countOpenProvidersRequest.dec({ name });
+        end({ status });
+        countOpenProvidersRequest.dec({ name, type });
       }
     })
   );

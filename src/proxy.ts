@@ -10,12 +10,14 @@ import {
 import useProxyCache from './middlewares/useProxyCache';
 
 const router = express.Router();
+const UNSUPPORTED_FILE_TYPE = 'unsupported file type';
 
-router.get('/ipfs/*', useProxyCache, async (req, res) => {
+router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', useProxyCache, async (req, res) => {
   try {
     const result = await Promise.any(
       gateways.map(async gateway => {
         const end = timeIpfsGatewaysResponse.startTimer({ name: gateway });
+        let status = 0;
 
         try {
           countOpenGatewaysRequest.inc({ name: gateway });
@@ -27,9 +29,21 @@ router.get('/ipfs/*', useProxyCache, async (req, res) => {
             return Promise.reject(response.status);
           }
 
-          return { gateway, json: await response.json() };
+          if (!['text/plain', 'application/json'].includes(response.headers.get('content-type'))) {
+            return Promise.reject(UNSUPPORTED_FILE_TYPE);
+          }
+
+          let json;
+          try {
+            json = await response.json();
+          } catch (e: any) {
+            return Promise.reject(e);
+          }
+
+          status = 1;
+          return { gateway, json };
         } finally {
-          end();
+          end({ status });
           countOpenGatewaysRequest.dec({ name: gateway });
         }
       })
@@ -39,7 +53,7 @@ router.get('/ipfs/*', useProxyCache, async (req, res) => {
     return res.json(result.json);
   } catch (e) {
     if (e instanceof AggregateError) {
-      return res.status(400).json();
+      return res.status(e.errors.includes(UNSUPPORTED_FILE_TYPE) ? 415 : 400).json();
     }
 
     capture(e);

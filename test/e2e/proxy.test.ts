@@ -1,30 +1,29 @@
 import request from 'supertest';
-import { cacheKey } from '../../src/middlewares/useProxyCache';
 import { set, get, remove } from '../../src/aws';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
-describe('GET /ipfs/*', () => {
+describe('GET /ipfs/:cid', () => {
   describe('when the IPFS cid exists', () => {
-    const path = '/ipfs/bafkreib5epjzumf3omr7rth5mtcsz4ugcoh3ut4d46hx5xhwm4b3pqr2vi';
+    const cid = 'bafkreib5epjzumf3omr7rth5mtcsz4ugcoh3ut4d46hx5xhwm4b3pqr2vi';
+    const path = `/ipfs/${cid}`;
     const content = { status: 'OK' };
-    const key = `cache/${cacheKey(path)}`;
 
     afterEach(async () => {
-      await remove(key);
+      await remove(cid);
     });
 
     describe('when the file is cached', () => {
       const cachedContent = { status: 'CACHED' };
 
       it('returns the cache file', async () => {
-        await set(key, cachedContent);
+        await set(cid, cachedContent);
         const response = await request(HOST).get(path);
 
         expect(response.body).toEqual(cachedContent);
         expect(response.statusCode).toBe(200);
         expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-        expect(await get(key)).toEqual(cachedContent);
+        expect(await get(cid)).toEqual(cachedContent);
       });
     });
 
@@ -35,9 +34,17 @@ describe('GET /ipfs/*', () => {
         expect(response.body).toEqual(content);
         expect(response.statusCode).toBe(200);
         expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-        expect(await get(key)).toEqual(response.body);
+        expect(await get(cid)).toEqual(response.body);
       });
     });
+
+    it('returns a 415 error when not a JSON file', async () => {
+      const response = await request(HOST).get(
+        '/ipfs/bafybeie2x4ptheqskiauhfz4w4pbq7o6742oupitganczhjanvffp2spti'
+      );
+
+      expect(response.statusCode).toBe(415);
+    }, 30e3);
   });
 
   describe('when the IPFS cid does not exist', () => {
@@ -45,6 +52,6 @@ describe('GET /ipfs/*', () => {
       const response = await request(HOST).get('/ipfs/test');
 
       expect(response.statusCode).toBe(400);
-    });
+    }, 30e3);
   });
 });
