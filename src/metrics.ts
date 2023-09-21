@@ -64,6 +64,18 @@ export const ipfsGatewaysReturnCount = new client.Counter({
   labelNames: ['name']
 });
 
+export const ipfsGatewaysCacheHitCount = new client.Counter({
+  name: 'ipfs_gateways_cache_hit_count',
+  help: 'Number of hit/miss of the IPFS gateways cache layer',
+  labelNames: ['status']
+});
+
+export const ipfsGatewaysCacheSize = new client.Counter({
+  name: 'ipfs_gateways_cache_size',
+  help: 'Total size going through the IPFS gateways cache layer',
+  labelNames: ['status']
+});
+
 export const countOpenProvidersRequest = new client.Gauge({
   name: 'providers_open_connections_count',
   help: 'Number of open connections to providers.',

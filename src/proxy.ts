@@ -2,22 +2,18 @@ import express from 'express';
 import fetch from 'node-fetch';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import gateways from './gateways.json';
-import { set, get } from './aws';
-import { MAX } from './utils';
 import {
   ipfsGatewaysReturnCount,
   timeIpfsGatewaysResponse,
   countOpenGatewaysRequest
 } from './metrics';
+import useProxyCache from './middlewares/useProxyCache';
 
 const router = express.Router();
+const UNSUPPORTED_FILE_TYPE = 'unsupported file type';
 
-router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', async (req, res) => {
-  const { cid } = req.params;
+router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', useProxyCache, async (req, res) => {
   try {
-    const cache = await get(cid);
-    if (cache) return res.json(cache);
-
     const result = await Promise.any(
       gateways.map(async gateway => {
         const end = timeIpfsGatewaysResponse.startTimer({ name: gateway });
@@ -34,14 +30,14 @@ router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', async (req, res) => {
           }
 
           if (!['text/plain', 'application/json'].includes(response.headers.get('content-type'))) {
-            return Promise.reject('');
+            return Promise.reject(UNSUPPORTED_FILE_TYPE);
           }
 
           let json;
           try {
             json = await response.json();
-          } catch {
-            return Promise.reject('');
+          } catch (e: any) {
+            return Promise.reject(e);
           }
 
           status = 1;
@@ -54,17 +50,10 @@ router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', async (req, res) => {
     );
     ipfsGatewaysReturnCount.inc({ name: result.gateway });
 
-    try {
-      const size = Buffer.from(JSON.stringify(result.json)).length;
-      if (size <= MAX) await set(cid, result.json);
-    } catch (e) {
-      capture(e);
-    }
-
     return res.json(result.json);
   } catch (e) {
     if (e instanceof AggregateError) {
-      return res.status(400).json();
+      return res.status(e.errors.includes(UNSUPPORTED_FILE_TYPE) ? 415 : 400).json();
     }
 
     capture(e);
