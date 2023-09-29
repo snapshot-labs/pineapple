@@ -7,6 +7,8 @@ import * as Web3Storage from '../../../src/providers/web3storage';
 import * as FourEverland from '../../../src/providers/4everland';
 
 describe('providers', () => {
+  jest.retryTimes(2);
+
   const json = {
     input: {
       status: 'OK'
