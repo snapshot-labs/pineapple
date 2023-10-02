@@ -46,6 +46,7 @@ export async function get(key) {
 }
 
 export async function remove(key) {
+  if (!client) return false;
   try {
     return await client.deleteObject({
       Bucket: process.env.AWS_BUCKET_NAME,
