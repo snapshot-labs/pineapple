@@ -14,28 +14,36 @@ describe('GET /ipfs/:cid', () => {
     });
 
     describe('when the file is cached', () => {
-      const cachedContent = { status: 'CACHED' };
+      if (process.env.AWS_REGION) {
+        const cachedContent = { status: 'CACHED' };
 
-      it('returns the cache file', async () => {
-        await set(cid, cachedContent);
-        const response = await request(HOST).get(path);
+        it('returns the cache file', async () => {
+          await set(cid, cachedContent);
+          const response = await request(HOST).get(path);
 
-        expect(response.body).toEqual(cachedContent);
-        expect(response.statusCode).toBe(200);
-        expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-        expect(await get(cid)).toEqual(cachedContent);
-      });
+          expect(response.body).toEqual(cachedContent);
+          expect(response.statusCode).toBe(200);
+          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+          expect(await get(cid)).toEqual(cachedContent);
+        });
+      } else {
+        it.todo('needs to set AWS credentials to test the cache');
+      }
     });
 
     describe('when the file is not cached', () => {
-      it('returns the file and caches it', async () => {
-        const response = await request(HOST).get(path);
+      if (process.env.AWS_REGION) {
+        it('returns the file and caches it', async () => {
+          const response = await request(HOST).get(path);
 
-        expect(response.body).toEqual(content);
-        expect(response.statusCode).toBe(200);
-        expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-        expect(await get(cid)).toEqual(response.body);
-      });
+          expect(response.body).toEqual(content);
+          expect(response.statusCode).toBe(200);
+          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+          expect(await get(cid)).toEqual(response.body);
+        });
+      } else {
+        it.todo('needs to set AWS credentials to test the cache');
+      }
     });
 
     it('returns a 415 error when not a JSON file', async () => {
