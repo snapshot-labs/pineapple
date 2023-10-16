@@ -30,12 +30,12 @@ router.post('/upload', async (req, res) => {
         })
         .webp({ lossless: true });
 
-      const buffer = await fs
+      const payload = await fs
         .createReadStream(req.file?.path as string)
         .pipe(transformer)
         .toBuffer();
 
-      const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', buffer);
+      const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', payload);
       const file = {
         cid: result.cid,
         provider: result.provider

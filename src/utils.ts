@@ -1,7 +1,8 @@
 import { createHash } from 'crypto';
 import { Response } from 'express';
+import FileType from 'file-type';
 
-export const MAX = 10e4;
+export const MAX = 10e6;
 
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
@@ -25,4 +26,13 @@ export function rpcError(res: Response, code: number, e: Error | string, id = nu
 
 export function sha256(input: string | Buffer) {
   return createHash('sha256').update(input).digest('hex');
+}
+
+export async function getContentType(input: Buffer) {
+  try {
+    JSON.parse(input.toString());
+    return 'application/json';
+  } catch (e) {
+    return (await FileType.fromBuffer(input))?.mime;
+  }
 }

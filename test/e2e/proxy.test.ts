@@ -1,58 +1,58 @@
 import request from 'supertest';
+import jsonFixture from './fixtures/json';
+import imageFixture from './fixtures/image';
 import { set, get, remove } from '../../src/aws';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
+const FIXTURES: [string, Record<string, any>][] = [
+  ['json', jsonFixture],
+  ['image', imageFixture]
+];
+
+function normalizeResponse(output: Buffer, fileType: string): JSON | Buffer {
+  return fileType === 'json' ? JSON.parse(output.toString()) : output;
+}
 
 describe('GET /ipfs/:cid', () => {
   describe('when the IPFS cid exists', () => {
-    const cid = 'bafkreib5epjzumf3omr7rth5mtcsz4ugcoh3ut4d46hx5xhwm4b3pqr2vi';
-    const path = `/ipfs/${cid}`;
-    const content = { status: 'OK' };
-
     afterEach(async () => {
-      await remove(cid);
+      await Promise.all([jsonFixture, imageFixture].map(({ cid }) => remove(cid)));
     });
 
-    describe('when the file is cached', () => {
+    describe.each(FIXTURES)('when the %s file is cached', (fileType, fixture) => {
       if (process.env.AWS_REGION) {
-        const cachedContent = { status: 'CACHED' };
+        it('returns the cached file', async () => {
+          const randomCid = 'randomcid';
+          await set(randomCid, await fixture.alternateContent);
+          const response = await request(HOST).get(`/ipfs/${randomCid}`);
 
-        it('returns the cache file', async () => {
-          await set(cid, cachedContent);
-          const response = await request(HOST).get(path);
-
-          expect(response.body).toEqual(cachedContent);
           expect(response.statusCode).toBe(200);
-          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-          expect(await get(cid)).toEqual(cachedContent);
+          expect(response.headers['content-type']).toContain(fixture.contentType);
+          expect(response.body).toEqual(
+            normalizeResponse(await fixture.alternateContent, fileType)
+          );
         });
       } else {
         it.todo('needs to set AWS credentials to test the cache');
       }
     });
 
-    describe('when the file is not cached', () => {
+    describe.each(FIXTURES)('when the %s file is not cached', (fileType, fixture) => {
       if (process.env.AWS_REGION) {
         it('returns the file and caches it', async () => {
-          const response = await request(HOST).get(path);
+          const response = await request(HOST).get(`/ipfs/${fixture.cid}`);
 
-          expect(response.body).toEqual(content);
           expect(response.statusCode).toBe(200);
-          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
-          expect(await get(cid)).toEqual(response.body);
-        });
+          expect(response.headers['content-type']).toContain(fixture.contentType);
+          expect(response.body).toEqual(normalizeResponse(await fixture.content, fileType));
+          expect(normalizeResponse(await get(fixture.cid), fileType)).toEqual(
+            normalizeResponse(await fixture.content, fileType)
+          );
+        }, 10e3);
       } else {
         it.todo('needs to set AWS credentials to test the cache');
       }
     });
-
-    it('returns a 415 error when not a JSON file', async () => {
-      const response = await request(HOST).get(
-        '/ipfs/bafybeie2x4ptheqskiauhfz4w4pbq7o6742oupitganczhjanvffp2spti'
-      );
-
-      expect(response.statusCode).toBe(415);
-    }, 30e3);
   });
 
   describe('when the IPFS cid does not exist', () => {

@@ -1,5 +1,5 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { MAX } from '../utils';
+import { MAX, getContentType } from '../utils';
 import { get, set } from '../aws';
 import { ipfsGatewaysCacheHitCount, ipfsGatewaysCacheSize } from '../metrics';
 
@@ -10,32 +10,36 @@ import { ipfsGatewaysCacheHitCount, ipfsGatewaysCacheSize } from '../metrics';
 export default async function useProxyCache(req, res, next) {
   const { cid } = req.params;
 
-  const cache = await get(cid);
-  if (cache) {
-    const cachedSize = Buffer.from(JSON.stringify(cache)).length;
+  try {
+    const cache = await get(cid);
+
     ipfsGatewaysCacheHitCount.inc({ status: 'HIT' });
-    ipfsGatewaysCacheSize.inc({ status: 'HIT' }, cachedSize);
-    return res.json(cache);
+    ipfsGatewaysCacheSize.inc({ status: 'HIT' }, cache.length);
+
+    res.set('Content-Type', await getContentType(cache));
+    return res.send(cache);
+  } catch (e) {
+    // Cache does not exist
   }
 
-  const oldJson = res.json;
-  res.json = async body => {
-    res.locals.body = body;
+  const oldSend = res.send;
+  res.send = async buffer => {
+    res.locals.buffer = buffer;
 
-    if (res.statusCode === 200 && body) {
+    if (res.statusCode === 200 && buffer) {
       try {
-        const size = Buffer.from(JSON.stringify(body)).length;
+        const size = buffer.length;
         if (size <= MAX) {
           ipfsGatewaysCacheHitCount.inc({ status: 'MISS' });
           ipfsGatewaysCacheSize.inc({ status: 'MISS' }, size);
-          await set(cid, body);
+          await set(cid, buffer);
         }
       } catch (e) {
         capture(e);
       }
     }
 
-    return oldJson.call(res, body);
+    return oldSend.call(res, buffer);
   };
 
   next();
