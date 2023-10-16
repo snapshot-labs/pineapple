@@ -46,7 +46,7 @@ export async function get(key: string) {
     });
     const result = await streamToBuffer(Body);
 
-    if (ContentType.includes(constants.json.contentType)) {
+    if (ContentType === constants.json.contentType) {
       return result.toString('utf8');
     }
     return result;
