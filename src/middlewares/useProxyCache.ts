@@ -13,9 +13,7 @@ export default async function useProxyCache(req, res, next) {
   try {
     const cache = await get(cid);
 
-    ipfsGatewaysCacheHitCount.inc({ status: 'HIT' });
-    ipfsGatewaysCacheSize.inc({ status: 'HIT' }, cache.length);
-
+    updateCacheMetrics('HIT', cache.length);
     res.set('Content-Type', await getContentType(cache));
     return res.send(cache);
   } catch (e) {
@@ -32,8 +30,7 @@ export default async function useProxyCache(req, res, next) {
         const size = buffer.length;
 
         if (size <= getMaxFileSize(contentType)) {
-          ipfsGatewaysCacheHitCount.inc({ status: 'MISS' });
-          ipfsGatewaysCacheSize.inc({ status: 'MISS' }, size);
+          updateCacheMetrics('HIT', size);
           await set(cid, buffer);
         }
       } catch (e) {
@@ -45,4 +42,9 @@ export default async function useProxyCache(req, res, next) {
   };
 
   next();
+}
+
+function updateCacheMetrics(status: 'HIT' | 'MISS', size: number) {
+  ipfsGatewaysCacheHitCount.inc({ status });
+  ipfsGatewaysCacheSize.inc({ status }, size);
 }
