@@ -3,17 +3,15 @@ import express from 'express';
 import multer from 'multer';
 import sharp from 'sharp';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { rpcError, rpcSuccess } from './utils';
+import { getMaxFileSize, rpcError, rpcSuccess } from './utils';
 import uploadToProviders from './providers/';
 import { IMAGE_PROVIDERS } from './providers/utils';
-
-const MAX_INPUT_SIZE = 1024 * 1024;
-const MAX_IMAGE_DIMENSION = 1500;
+import constants from './constants.json';
 
 const router = express.Router();
 const upload = multer({
   dest: 'uploads/',
-  limits: { fileSize: MAX_INPUT_SIZE }
+  limits: { fileSize: getMaxFileSize('image') }
 }).single('file');
 
 router.post('/upload', async (req, res) => {
@@ -24,8 +22,8 @@ router.post('/upload', async (req, res) => {
 
       const transformer = sharp()
         .resize({
-          width: MAX_IMAGE_DIMENSION,
-          height: MAX_IMAGE_DIMENSION,
+          width: constants.image.maxWidth,
+          height: constants.image.maxHeight,
           fit: 'inside'
         })
         .webp({ lossless: true });

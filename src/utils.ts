@@ -1,8 +1,7 @@
 import { createHash } from 'crypto';
 import { Response } from 'express';
 import FileType from 'file-type';
-
-export const MAX = 10e4;
+import constants from './constants.json';
 
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
@@ -35,4 +34,12 @@ export async function getContentType(input: Buffer) {
   } catch (e) {
     return (await FileType.fromBuffer(input))?.mime;
   }
+}
+
+export function getMaxFileSize(contentType: string | undefined): number {
+  if ((contentType || '').split('/')[0] === 'image') {
+    return constants.image.maxFileSize;
+  }
+
+  return constants.json.maxFileSize;
 }

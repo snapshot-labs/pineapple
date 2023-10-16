@@ -1,5 +1,5 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { MAX, getContentType } from '../utils';
+import { getContentType, getMaxFileSize } from '../utils';
 import { get, set } from '../aws';
 import { ipfsGatewaysCacheHitCount, ipfsGatewaysCacheSize } from '../metrics';
 
@@ -28,8 +28,10 @@ export default async function useProxyCache(req, res, next) {
 
     if (res.statusCode === 200 && buffer) {
       try {
+        const contentType = await getContentType(buffer);
         const size = buffer.length;
-        if (size <= MAX) {
+
+        if (size <= getMaxFileSize(contentType)) {
           ipfsGatewaysCacheHitCount.inc({ status: 'MISS' });
           ipfsGatewaysCacheSize.inc({ status: 'MISS' }, size);
           await set(cid, buffer);
