@@ -15,9 +15,7 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const payload = Buffer.from(JSON.stringify(params));
-
-    const size = payload.length;
+    const size = Buffer.from(JSON.stringify(params)).length;
     if (size > getMaxFileSize('json')) return rpcError(res, 400, 'File too large', id);
 
     const result = await uploadToProviders(JSON_PROVIDERS, 'json', params);
