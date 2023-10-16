@@ -38,7 +38,7 @@ export async function getContentType(input: Buffer) {
   }
 }
 
-export function getMaxFileSize(contentType: ProviderType | undefined): number {
+export function getMaxFileSize(contentType: string | undefined): number {
   if ((contentType || '').split('/')[0] === 'image') {
     return constants.image.maxFileSize;
   }
