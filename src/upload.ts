@@ -6,6 +6,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { getMaxFileSize, rpcError, rpcSuccess } from './utils';
 import uploadToProviders from './providers/';
 import { IMAGE_PROVIDERS } from './providers/utils';
+import { set as setAws } from './aws';
 import constants from './constants.json';
 
 const router = express.Router();
@@ -38,6 +39,12 @@ router.post('/upload', async (req, res) => {
         cid: result.cid,
         provider: result.provider
       };
+
+      try {
+        await setAws(result.cid, payload);
+      } catch (e: any) {
+        capture(e);
+      }
 
       return rpcSuccess(res, file);
     } catch (e: any) {

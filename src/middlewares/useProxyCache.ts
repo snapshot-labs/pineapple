@@ -5,7 +5,7 @@ import { ipfsGatewaysCacheHitCount, ipfsGatewaysCacheSize } from '../metrics';
 
 /**
  * This middleware serves a cache if it exists, else it will process the controller
- * and caches its results if it's less than 1MB
+ * and caches its results if it's less than 1MB for image and 100kb for JSON
  */
 export default async function useProxyCache(req, res, next) {
   const { cid } = req.params;
