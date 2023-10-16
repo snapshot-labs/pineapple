@@ -29,19 +29,19 @@ router.post('/upload', async (req, res) => {
         })
         .webp({ lossless: true });
 
-      const payload = await fs
+      const buffer = await fs
         .createReadStream(req.file?.path as string)
         .pipe(transformer)
         .toBuffer();
 
-      const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', payload);
+      const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', buffer);
       const file = {
         cid: result.cid,
         provider: result.provider
       };
 
       try {
-        await setAws(result.cid, payload);
+        await setAws(result.cid, buffer);
       } catch (e: any) {
         capture(e);
       }
