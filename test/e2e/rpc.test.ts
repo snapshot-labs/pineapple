@@ -1,4 +1,5 @@
 import request from 'supertest';
+import heavyPayload from './fixtures/too-heavy.json';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
@@ -28,6 +29,13 @@ describe('POST /', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.body.error.message).toBe('Malformed body');
+    });
+
+    it('return an error when the payload exceed 100kb', async () => {
+      const response = await request(HOST).post('/').send(heavyPayload);
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.error.message).toBe('File too large');
     });
   });
 });
