@@ -2,8 +2,6 @@ import { createHash } from 'crypto';
 import { Response } from 'express';
 import constants from './constants.json';
 
-export type ProviderType = 'image' | 'json';
-
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
     jsonrpc: '2.0',

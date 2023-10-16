@@ -1,7 +1,8 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { timeProvidersUpload, providersUploadSize, countOpenProvidersRequest } from '../metrics';
 import { providersMap } from './utils';
-import type { ProviderType } from '../utils';
+
+type ProviderType = 'image' | 'json';
 
 export default function uploadToProviders(
   providers: string[],
