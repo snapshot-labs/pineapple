@@ -1,6 +1,5 @@
 import { createHash } from 'crypto';
 import { Response } from 'express';
-import FileType from 'file-type';
 import constants from './constants.json';
 
 export type ProviderType = 'image' | 'json';
@@ -27,15 +26,6 @@ export function rpcError(res: Response, code: number, e: Error | string, id = nu
 
 export function sha256(input: string | Buffer) {
   return createHash('sha256').update(input).digest('hex');
-}
-
-export async function getContentType(input: Buffer) {
-  try {
-    JSON.parse(input.toString());
-    return 'application/json';
-  } catch (e) {
-    return (await FileType.fromBuffer(input))?.mime;
-  }
 }
 
 export function getMaxFileSize(contentType: string | undefined): number {

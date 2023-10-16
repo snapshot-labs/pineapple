@@ -23,7 +23,7 @@ describe('POST /', () => {
     });
 
     it('caches the payload', async () => {
-      expect(await get(response.body.result.cid)).toEqual(Buffer.from(JSON.stringify(content)));
+      expect(JSON.parse((await get(response.body.result.cid)) as string)).toEqual(content);
     });
   });
 

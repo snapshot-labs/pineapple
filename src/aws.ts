@@ -1,6 +1,6 @@
 import * as AWS from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import { getContentType } from './utils';
+import constants from './constants.json';
 
 let client;
 const region = process.env.AWS_REGION;
@@ -17,7 +17,7 @@ async function streamToBuffer(stream: Readable): Promise<Buffer> {
   });
 }
 
-export async function set(key: string, value: Buffer) {
+export async function set(key: string, value: string | Buffer) {
   if (!client) {
     return Promise.reject('Cache not setup');
   }
@@ -27,7 +27,7 @@ export async function set(key: string, value: Buffer) {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: `public/${dir}/${key}`,
       Body: value,
-      ContentType: await getContentType(value)
+      ContentType: constants[value instanceof Buffer ? 'image' : 'json'].contentType
     });
   } catch (e) {
     throw e;
@@ -40,11 +40,16 @@ export async function get(key: string) {
   }
 
   try {
-    const { Body } = await client.getObject({
+    const { Body, ContentType } = await client.getObject({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: `public/${dir}/${key}`
     });
-    return await streamToBuffer(Body);
+    const result = await streamToBuffer(Body);
+
+    if (ContentType.includes(constants.json.contentType)) {
+      return result.toString('utf8');
+    }
+    return result;
   } catch (e) {
     return Promise.reject('Get cache failed');
   }

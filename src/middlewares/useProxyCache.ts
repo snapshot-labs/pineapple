@@ -1,7 +1,8 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { getContentType, getMaxFileSize } from '../utils';
+import { getMaxFileSize } from '../utils';
 import { get, set } from '../aws';
 import { ipfsGatewaysCacheHitCount, ipfsGatewaysCacheSize } from '../metrics';
+import constants from '../constants.json';
 
 /**
  * This middleware serves a cache if it exists, else it will process the controller
@@ -12,9 +13,9 @@ export default async function useProxyCache(req, res, next) {
 
   try {
     const cache = await get(cid);
+    updateCacheMetrics('HIT', Buffer.from(cache).length);
+    res.set('Content-Type', constants[cache instanceof Buffer ? 'image' : 'json'].contentType);
 
-    updateCacheMetrics('HIT', cache.length);
-    res.set('Content-Type', await getContentType(cache));
     return res.send(cache);
   } catch (e) {
     // Cache does not exist
@@ -26,12 +27,15 @@ export default async function useProxyCache(req, res, next) {
 
     if (res.statusCode === 200 && buffer) {
       try {
-        const contentType = await getContentType(buffer);
         const size = buffer.length;
+        const contentType = res.get('Content-Type');
 
         if (size <= getMaxFileSize(contentType)) {
           updateCacheMetrics('HIT', size);
-          await set(cid, buffer);
+          await set(
+            cid,
+            contentType.includes(constants.json.contentType) ? buffer.toString('utf8') : buffer
+          );
         }
       } catch (e) {
         capture(e);

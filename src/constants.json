@@ -1,10 +1,12 @@
 {
   "json": {
-    "maxFileSize": 100000
+    "maxFileSize": 100000,
+    "contentType": "application/json; charset=utf-8"
   },
   "image": {
     "maxFileSize": 1048576,
     "maxWidth": 1500,
-    "maxHeight": 1500
+    "maxHeight": 1500,
+    "contentType": "image/webp"
   }
 }
