@@ -3,6 +3,8 @@ import { Response } from 'express';
 import FileType from 'file-type';
 import constants from './constants.json';
 
+export type ProviderType = 'image' | 'json';
+
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
     jsonrpc: '2.0',
@@ -36,7 +38,7 @@ export async function getContentType(input: Buffer) {
   }
 }
 
-export function getMaxFileSize(contentType: string | undefined): number {
+export function getMaxFileSize(contentType: ProviderType | undefined): number {
   if ((contentType || '').split('/')[0] === 'image') {
     return constants.image.maxFileSize;
   }
