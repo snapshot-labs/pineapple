@@ -6,12 +6,9 @@ import fetch from 'node-fetch';
 import { get } from '../../src/aws';
 import { preProcessImage } from '../../src/utils';
 import constants from '../../src/constants.json';
+import { getRandomInt } from '../utils';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
-
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * max);
-}
 
 function randomImage() {
   return sharp({

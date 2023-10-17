@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { get, remove } from '../../src/aws';
 import heavyPayload from './fixtures/too-heavy.json';
 import jsonFixture from './fixtures/json';
+import { getRandomInt } from '../utils';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
@@ -17,17 +18,17 @@ function post(body?) {
 
 describe('POST /', () => {
   describe('when the payload is valid', () => {
+    const fixture = { random: `${getRandomInt(1000)}.${getRandomInt(1000)}` };
     let response;
     let body;
 
     beforeAll(async () => {
-      await remove(jsonFixture.cid);
-      response = await post({ params: jsonFixture.content });
+      response = await post({ params: fixture });
       body = await response.json();
     });
 
     afterAll(async () => {
-      await remove(jsonFixture.cid);
+      await remove(body.result.cid);
     });
 
     it('returns a 200 error', async () => {
@@ -35,12 +36,19 @@ describe('POST /', () => {
     });
 
     it('returns the result with CID and provider name', () => {
-      expect(body.result.cid).toEqual(jsonFixture.cid);
+      expect(body.result.cid.length).toBeGreaterThan(10);
       expect(['4everland', 'infura', 'fleek', 'pinata']).toContain(body.result.provider);
     });
 
+    it('uploads the payload to the provider', async () => {
+      const providerReponse = await fetch(
+        `https://snapshot.4everland.link/ipfs/${body.result.cid}`
+      );
+      expect(await providerReponse.buffer()).toEqual(Buffer.from(JSON.stringify(fixture)));
+    }, 10e3);
+
     it('caches the payload', async () => {
-      expect(JSON.parse((await get(body.result.cid)) as string)).toEqual(jsonFixture.content);
+      expect(JSON.parse((await get(body.result.cid)) as string)).toEqual(fixture);
     });
   });
 
