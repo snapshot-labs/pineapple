@@ -1,10 +1,33 @@
 import path from 'path';
 import fs from 'fs';
 import request from 'supertest';
+import sharp from 'sharp';
 import fetch from 'node-fetch';
 import { get } from '../../src/aws';
+import { preProcessImage } from '../../src/utils';
+import constants from '../../src/constants.json';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
+
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * max);
+}
+
+function randomImage() {
+  return sharp({
+    create: {
+      width: getRandomInt(constants.image.maxWidth),
+      height: getRandomInt(constants.image.maxHeight),
+      channels: 4,
+      background: {
+        r: getRandomInt(255),
+        g: getRandomInt(255),
+        b: getRandomInt(255),
+        alpha: getRandomInt(100) / 100
+      }
+    }
+  }).png();
+}
 
 describe('POST /upload', () => {
   describe('when the payload is not valid', () => {
@@ -41,14 +64,22 @@ describe('POST /upload', () => {
   });
 
   describe('when the payload is correct', () => {
-    const imagePath = path.join(__dirname, './fixtures/valid.webp');
+    const originalImagePath = path.join(__dirname, './fixtures/random-image.webp');
     let response;
     let body;
+    let finalImageBuffer;
 
     beforeAll(async () => {
-      response = await request(HOST).post('/upload').attach('file', imagePath);
+      await randomImage().toFile(originalImagePath);
+      finalImageBuffer = await preProcessImage(await fs.createReadStream(originalImagePath));
+
+      response = await request(HOST).post('/upload').attach('file', originalImagePath);
       body = response.body;
     }, 10e3);
+
+    afterAll(async () => {
+      await fs.rmSync(originalImagePath);
+    });
 
     it('returns the correct HTTP response', () => {
       expect(response.statusCode).toBe(200);
@@ -61,13 +92,15 @@ describe('POST /upload', () => {
       expect(['4everland', 'infura', 'fleek', 'pinata']).toContain(body.result.provider);
     });
 
-    it('uploads the image to the provider', async () => {
-      const providerReponse = await fetch(`https://cloudflare-ipfs.com/ipfs/${body.result.cid}`);
-      expect(await providerReponse.buffer()).toEqual(await fs.promises.readFile(imagePath));
-    });
+    it('uploads the processed image to the provider', async () => {
+      const providerReponse = await fetch(
+        `https://snapshot.4everland.link/ipfs/${body.result.cid}`
+      );
+      expect(await providerReponse.buffer()).toEqual(finalImageBuffer);
+    }, 10e3);
 
-    it('caches the payload', async () => {
-      expect(await get(body.result.cid)).toEqual(await fs.promises.readFile(imagePath));
+    it('caches the processed image', async () => {
+      expect(await get(body.result.cid)).toEqual(finalImageBuffer);
     });
   });
 });

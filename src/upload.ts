@@ -1,13 +1,11 @@
 import fs from 'fs';
 import express from 'express';
 import multer from 'multer';
-import sharp from 'sharp';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { getMaxFileSize, rpcError, rpcSuccess } from './utils';
+import { getMaxFileSize, rpcError, rpcSuccess, preProcessImage } from './utils';
 import uploadToProviders from './providers/';
 import { IMAGE_PROVIDERS } from './providers/utils';
 import { set as setAws } from './aws';
-import constants from './constants.json';
 
 const router = express.Router();
 const upload = multer({
@@ -21,19 +19,7 @@ router.post('/upload', async (req, res) => {
       if (err) return rpcError(res, 400, err.message);
       if (!req.file) return rpcError(res, 400, 'No file submitted');
 
-      const transformer = sharp()
-        .resize({
-          width: constants.image.maxWidth,
-          height: constants.image.maxHeight,
-          fit: 'inside'
-        })
-        .webp({ lossless: true });
-
-      const buffer = await fs
-        .createReadStream(req.file?.path as string)
-        .pipe(transformer)
-        .toBuffer();
-
+      const buffer = await preProcessImage(await fs.createReadStream(req.file?.path as string));
       const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', buffer);
       const file = {
         cid: result.cid,
