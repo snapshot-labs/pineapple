@@ -1,52 +1,69 @@
-import request from 'supertest';
-import { get } from '../../src/aws';
+import fetch from 'node-fetch';
+import { get, remove } from '../../src/aws';
 import heavyPayload from './fixtures/too-heavy.json';
+import jsonFixture from './fixtures/json';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
+function post(body?) {
+  return fetch(HOST, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    ...(body ? { body: JSON.stringify(body) } : {})
+  });
+}
+
 describe('POST /', () => {
   describe('when the payload is valid', () => {
-    const content = { test: 'value' };
     let response;
+    let body;
 
     beforeAll(async () => {
-      response = await request(HOST).post('/').send({ params: content });
+      await remove(jsonFixture.cid);
+      response = await post({ params: jsonFixture.content });
+      body = await response.json();
+    });
+
+    afterAll(async () => {
+      await remove(jsonFixture.cid);
     });
 
     it('returns a 200 error', async () => {
-      expect(response.statusCode).toBe(200);
+      expect(response.status).toBe(200);
     });
 
-    it('returns a payload', () => {
-      expect(response.body.result.cid.length).toBeGreaterThan(10);
-      expect(['4everland', 'infura', 'fleek', 'pinata']).toContain(response.body.result.provider);
+    it('returns the result with CID and provider name', () => {
+      expect(body.result.cid).toEqual(jsonFixture.cid);
+      expect(['4everland', 'infura', 'fleek', 'pinata']).toContain(body.result.provider);
     });
 
     it('caches the payload', async () => {
-      expect(JSON.parse((await get(response.body.result.cid)) as string)).toEqual(content);
+      expect(JSON.parse((await get(body.result.cid)) as string)).toEqual(jsonFixture.content);
     });
   });
 
   describe('when the payload is not valid', () => {
     it('returns a 400 error on malformed json', async () => {
-      const response = await request(HOST).post('/').send({ test: 'value' });
+      const response = await post({ test: 'value' });
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error.message).toBe('Malformed body');
+      expect(response.status).toBe(400);
+      expect((await response.json()).error.message).toBe('Malformed body');
     });
 
     it('returns a 400 error on empty body', async () => {
-      const response = await request(HOST).post('/');
+      const response = await post();
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error.message).toBe('Malformed body');
+      expect(response.status).toBe(400);
+      expect((await response.json()).error.message).toBe('Malformed body');
     });
 
     it('return an error when the payload exceed 100kb', async () => {
-      const response = await request(HOST).post('/').send(heavyPayload);
+      const response = await post({ params: heavyPayload });
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error.message).toBe('File too large');
+      expect(response.status).toBe(400);
+      expect((await response.json()).error.message).toBe('File too large');
     });
   });
 });

@@ -1,4 +1,4 @@
-import request from 'supertest';
+import fetch from 'node-fetch';
 import jsonFixture from './fixtures/json';
 import imageFixture from './fixtures/image';
 import { set, get, remove } from '../../src/aws';
@@ -9,6 +9,10 @@ const FIXTURES: [string, Record<string, any>][] = [
   ['image', imageFixture]
 ];
 
+async function normalizeContent(content: Promise<any>, fileType: string) {
+  return fileType === 'json' ? Buffer.from(JSON.stringify(await content)) : await content;
+}
+
 describe('GET /ipfs/:cid', () => {
   describe('when the IPFS cid exists', () => {
     afterAll(async () => {
@@ -17,16 +21,24 @@ describe('GET /ipfs/:cid', () => {
 
     describe.each(FIXTURES)('when the %s file is cached', (fileType, fixture) => {
       if (process.env.AWS_REGION) {
-        it('returns the cached file', async () => {
+        let response;
+
+        beforeAll(async () => {
           const randomCid = 'randomcid';
           const content = await fixture.alternateContent;
           await set(randomCid, fileType === 'json' ? JSON.stringify(content) : content);
-          const response = await request(HOST).get(`/ipfs/${randomCid}`);
+          response = await fetch(`${HOST}/ipfs/${randomCid}`);
+        });
 
-          expect(response.statusCode).toBe(200);
-          expect(response.headers['content-type']).toContain(fixture.contentType);
+        it('returns the correct HTTP response', () => {
+          expect(response.status).toBe(200);
+          expect(response.headers.get('content-type')).toContain(fixture.contentType);
+        });
 
-          expect(response.body).toEqual(await fixture.alternateContent);
+        it('returns the cached file', async () => {
+          expect(await response.buffer()).toEqual(
+            await normalizeContent(fixture.alternateContent, fileType)
+          );
         });
       } else {
         it.todo('needs to set AWS credentials to test the cache');
@@ -38,13 +50,18 @@ describe('GET /ipfs/:cid', () => {
         let response;
 
         beforeAll(async () => {
-          response = await request(HOST).get(`/ipfs/${fixture.cid}`);
-        }, 10e3);
+          response = await fetch(`${HOST}/ipfs/${fixture.cid}`);
+        });
+
+        it('returns the correct HTTP response', () => {
+          expect(response.status).toBe(200);
+          expect(response.headers.get('content-type')).toContain(fixture.contentType);
+        });
 
         it('returns the file', async () => {
-          expect(response.statusCode).toBe(200);
-          expect(response.headers['content-type']).toContain(fixture.contentType);
-          expect(response.body).toEqual(await fixture.content);
+          expect(await response.buffer()).toEqual(
+            await normalizeContent(fixture.content, fileType)
+          );
         });
 
         it('caches the file', async () => {
@@ -61,9 +78,9 @@ describe('GET /ipfs/:cid', () => {
 
   describe('when the IPFS cid does not exist', () => {
     it('returns a 400 error', async () => {
-      const response = await request(HOST).get('/ipfs/test');
+      const response = await fetch(`${HOST}/ipfs/test`);
 
-      expect(response.statusCode).toBe(400);
+      expect(response.status).toBe(400);
     }, 30e3);
   });
 });
