@@ -35,9 +35,9 @@ router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', useProxyCache, async (req, res) => {
           if (ALLOWED_CONTENT_TYPE.some(type => type.test(contentType))) {
             status = 1;
             return { gateway, result: await response.buffer(), contentType };
-          } else {
-            return Promise.reject(UNSUPPORTED_FILE_TYPE);
           }
+
+          return Promise.reject(UNSUPPORTED_FILE_TYPE);
         } finally {
           end({ status });
           countOpenGatewaysRequest.dec({ name: gateway });
