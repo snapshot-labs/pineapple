@@ -7,7 +7,7 @@ type ProviderType = 'image' | 'json';
 export default function uploadToProviders(
   providers: string[],
   type: ProviderType,
-  payload: Buffer
+  payload: string | Buffer
 ) {
   const configuredProviders = providers.filter(p => providersMap[p].isConfigured());
 
@@ -20,7 +20,9 @@ export default function uploadToProviders(
         countOpenProvidersRequest.inc({ name, type });
 
         const result = await providersMap[name].set(payload);
-        providersUploadSize.inc({ name, type }, payload.length);
+        const size = (payload instanceof Buffer ? payload : Buffer.from(JSON.stringify(payload)))
+          .length;
+        providersUploadSize.inc({ name, type }, size);
         status = 1;
 
         return result;
