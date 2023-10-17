@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import { get, remove } from '../../src/aws';
 import heavyPayload from './fixtures/too-heavy.json';
-import jsonFixture from './fixtures/json';
 import { getRandomInt } from '../utils';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
