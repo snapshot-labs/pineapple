@@ -23,7 +23,7 @@
     "@fleekhq/fleek-storage-js": "^1.0.21",
     "@pinata/sdk": "^1.1.25",
     "@snapshot-labs/snapshot-metrics": "^1.4.1",
-    "@snapshot-labs/snapshot-sentry": "^1.5.2",
+    "@snapshot-labs/snapshot-sentry": "^1.5.4",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
