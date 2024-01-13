@@ -1,19 +1,16 @@
 import fs from 'fs';
 import express from 'express';
 import multer from 'multer';
-import sharp from 'sharp';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { rpcError, rpcSuccess } from './utils';
+import { getMaxFileSize, rpcError, rpcSuccess, preProcessImage } from './utils';
 import uploadToProviders from './providers/';
 import { IMAGE_PROVIDERS } from './providers/utils';
-
-const MAX_INPUT_SIZE = 1024 * 1024;
-const MAX_IMAGE_DIMENSION = 1500;
+import { set as setAws } from './aws';
 
 const router = express.Router();
 const upload = multer({
   dest: 'uploads/',
-  limits: { fileSize: MAX_INPUT_SIZE }
+  limits: { fileSize: getMaxFileSize('image') }
 }).single('file');
 
 router.post('/upload', async (req, res) => {
@@ -22,24 +19,18 @@ router.post('/upload', async (req, res) => {
       if (err) return rpcError(res, 400, err.message);
       if (!req.file) return rpcError(res, 400, 'No file submitted');
 
-      const transformer = sharp()
-        .resize({
-          width: MAX_IMAGE_DIMENSION,
-          height: MAX_IMAGE_DIMENSION,
-          fit: 'inside'
-        })
-        .webp({ lossless: true });
-
-      const buffer = await fs
-        .createReadStream(req.file?.path as string)
-        .pipe(transformer)
-        .toBuffer();
-
+      const buffer = await preProcessImage(await fs.createReadStream(req.file?.path as string));
       const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', buffer);
       const file = {
         cid: result.cid,
         provider: result.provider
       };
+
+      try {
+        await setAws(result.cid, buffer);
+      } catch (e: any) {
+        capture(e);
+      }
 
       return rpcSuccess(res, file);
     } catch (e: any) {
