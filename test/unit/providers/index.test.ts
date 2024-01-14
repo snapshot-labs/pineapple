@@ -3,7 +3,6 @@ import path from 'path';
 import * as Fleek from '../../../src/providers/fleek';
 import * as Infura from '../../../src/providers/infura';
 import * as Pinata from '../../../src/providers/pinata';
-import * as Web3Storage from '../../../src/providers/web3storage';
 import * as FourEverland from '../../../src/providers/4everland';
 
 describe('providers', () => {
@@ -37,7 +36,7 @@ describe('providers', () => {
 
   const providerPayload: { name: string; provider: any; idVersion: string }[] =
     buildProviderPayload([Fleek, Infura, Pinata], 'v0').concat(
-      buildProviderPayload([Web3Storage, FourEverland], 'v1')
+      buildProviderPayload([FourEverland], 'v1')
     );
 
   describe.each(providerPayload)('$name', ({ name, provider, idVersion }) => {
