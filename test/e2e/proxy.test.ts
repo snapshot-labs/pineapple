@@ -57,7 +57,7 @@ describe('GET /ipfs/:cid', () => {
 
   describe('when the IPFS cid does not exist', () => {
     it('returns a 400 error', async () => {
-      const response = await request(HOST).get('/ipfs/test');
+      const response = await request(HOST).get('/ipfs/no-exists');
 
       console.log(response.body);
       expect(response.statusCode).toBe(400);
