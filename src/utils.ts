@@ -1,7 +1,10 @@
+import sharp from 'sharp';
+import fs from 'fs';
 import { createHash } from 'crypto';
 import { Response } from 'express';
 
 export const MAX = 10e4;
+const MAX_IMAGE_DIMENSION = 1500;
 
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
@@ -25,4 +28,16 @@ export function rpcError(res: Response, code: number, e: Error | string, id = nu
 
 export function sha256(input: string | Buffer) {
   return createHash('sha256').update(input).digest('hex');
+}
+
+export async function processImage(path: string) {
+  const transformer = sharp({ failOnError: false })
+    .resize({
+      width: MAX_IMAGE_DIMENSION,
+      height: MAX_IMAGE_DIMENSION,
+      fit: 'inside'
+    })
+    .webp({ lossless: true });
+
+  return await fs.createReadStream(path).pipe(transformer).toBuffer();
 }
