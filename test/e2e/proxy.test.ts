@@ -1,5 +1,4 @@
 import request from 'supertest';
-import { randomUUID } from 'crypto';
 import { set, get, remove } from '../../src/aws';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
@@ -58,8 +57,9 @@ describe('GET /ipfs/:cid', () => {
 
   describe('when the IPFS cid does not exist', () => {
     it('returns a 400 error', async () => {
-      const response = await request(HOST).get(`/ipfs/test-${randomUUID()}`);
+      const response = await request(HOST).get('/ipfs/test');
 
+      console.log(response.body);
       expect(response.statusCode).toBe(400);
     }, 30e3);
   });
