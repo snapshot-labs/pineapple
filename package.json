@@ -12,6 +12,7 @@
     "start:test": "dotenv -e test/.env.test yarn dev",
     "test": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test jest --runInBand'",
     "test:unit": "dotenv -e test/.env.test jest test/unit/",
+    "test:integration": "dotenv -e test/.env.test jest test/integration/",
     "test:e2e": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'"
   },
   "eslintConfig": {
@@ -38,7 +39,7 @@
     "web3.storage": "^4.2.0"
   },
   "devDependencies": {
-    "@snapshot-labs/eslint-config": "^0.1.0-beta.11",
+    "@snapshot-labs/eslint-config": "^0.1.0-beta.15",
     "@snapshot-labs/prettier-config": "^0.1.0-beta.7",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.3",
