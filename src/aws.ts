@@ -52,7 +52,7 @@ export async function get(key: string) {
       return false;
     }
 
-    return await response.Body.transformToString();
+    return JSON.parse(await response.Body.transformToString());
   } catch (e: any) {
     if (e['$metadata']?.httpStatusCode !== 404) {
       capture(e, { key, path: path(key) });
