@@ -21,6 +21,7 @@ export default function uploadToProviders(providers: string[], type: ProviderTyp
         providersUploadSize.inc({ name, type }, size);
         status = 1;
 
+        console.log(`JSON pinned: ${result.provider} - ${result.cid}`);
         return result;
       } catch (e: any) {
         if (e instanceof Error) {
