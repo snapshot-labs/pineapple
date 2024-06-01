@@ -1,7 +1,8 @@
 import { createHash } from 'crypto';
 import { Response } from 'express';
-
-export const MAX = 10e4;
+import constants from './constants.json';
+import sharp from 'sharp';
+import { ReadStream } from 'fs';
 
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
@@ -25,4 +26,24 @@ export function rpcError(res: Response, code: number, e: Error | string, id = nu
 
 export function sha256(input: string | Buffer) {
   return createHash('sha256').update(input).digest('hex');
+}
+
+export function getMaxFileSize(contentType: string | undefined): number {
+  if ((contentType || '').split('/')[0] === 'image') {
+    return constants.image.maxFileSize;
+  }
+
+  return constants.json.maxFileSize;
+}
+
+export function preProcessImage(stream: ReadStream) {
+  const transformer = sharp()
+    .resize({
+      width: constants.image.maxWidth,
+      height: constants.image.maxHeight,
+      fit: 'inside'
+    })
+    .webp({ lossless: true });
+
+  return stream.pipe(transformer).toBuffer();
 }
