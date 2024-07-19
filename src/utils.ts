@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { Response } from 'express';
 
-export const MAX = 10e4;
+export const MAX = 50e4;
 
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
