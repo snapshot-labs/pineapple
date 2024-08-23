@@ -1,8 +1,8 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import type { Express } from 'express';
+import { Express } from 'express';
 import gateways from './gateways.json';
-import { providersMap, IMAGE_PROVIDERS, JSON_PROVIDERS } from './providers/utils';
+import { IMAGE_PROVIDERS, JSON_PROVIDERS, providersMap } from './providers/utils';
 
 export default function initMetrics(app: Express) {
   init(app, {

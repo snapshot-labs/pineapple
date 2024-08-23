@@ -1,7 +1,7 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { MAX } from '../utils';
 import { get, set } from '../aws';
 import { ipfsGatewaysCacheHitCount, ipfsGatewaysCacheSize } from '../metrics';
+import { MAX } from '../utils';
 
 /**
  * This middleware serves a cache if it exists, else it will process the controller

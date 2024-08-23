@@ -1,4 +1,4 @@
-import { Web3Storage, Blob, File } from 'web3.storage';
+import { Blob, File, Web3Storage } from 'web3.storage';
 import { sha256 } from '../utils';
 
 const { WEB3STORAGE_API_TOKEN } = process.env;

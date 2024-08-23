@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import * as FourEverland from '../../../src/providers/4everland';
 import * as Fleek from '../../../src/providers/fleek';
 import * as Infura from '../../../src/providers/infura';
 import * as Pinata from '../../../src/providers/pinata';
-import * as FourEverland from '../../../src/providers/4everland';
 
 describe('providers', () => {
   jest.retryTimes(2);

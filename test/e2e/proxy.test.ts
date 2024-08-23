@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { set, get, remove } from '../../src/aws';
+import { get, remove, set } from '../../src/aws';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 

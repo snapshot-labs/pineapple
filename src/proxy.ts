@@ -1,11 +1,11 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
 import fetch from 'node-fetch';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 import gateways from './gateways.json';
 import {
+  countOpenGatewaysRequest,
   ipfsGatewaysReturnCount,
-  timeIpfsGatewaysResponse,
-  countOpenGatewaysRequest
+  timeIpfsGatewaysResponse
 } from './metrics';
 import useProxyCache from './middlewares/useProxyCache';
 
