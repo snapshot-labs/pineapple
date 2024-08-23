@@ -11,7 +11,7 @@ describe('POST /', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body.result.cid.length).toBeGreaterThan(10);
-      expect(['4everland', 'infura', 'fleek', 'pinata']).toContain(response.body.result.provider);
+      expect(['4everland', 'fleek', 'pinata']).toContain(response.body.result.provider);
     });
   });
 
