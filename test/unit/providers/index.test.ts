@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import * as FourEverland from '../../../src/providers/4everland';
 import * as Fleek from '../../../src/providers/fleek';
-import * as Infura from '../../../src/providers/infura';
 import * as Pinata from '../../../src/providers/pinata';
 
 describe('providers', () => {
@@ -35,9 +34,7 @@ describe('providers', () => {
   }
 
   const providerPayload: { name: string; provider: any; idVersion: string }[] =
-    buildProviderPayload([Fleek, Infura, Pinata], 'v0').concat(
-      buildProviderPayload([FourEverland], 'v1')
-    );
+    buildProviderPayload([Fleek, Pinata], 'v0').concat(buildProviderPayload([FourEverland], 'v1'));
 
   describe.each(providerPayload)('$name', ({ name, provider, idVersion }) => {
     if (!provider.isConfigured()) {
