@@ -1,6 +1,6 @@
-import pinataSDK from '@pinata/sdk';
 import { randomUUID } from 'crypto';
 import { Readable } from 'stream';
+import pinataSDK from '@pinata/sdk';
 
 const { PINATA_API_KEY, PINATA_API_SECRET } = process.env;
 
