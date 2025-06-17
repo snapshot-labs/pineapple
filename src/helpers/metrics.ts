@@ -90,7 +90,7 @@ const providersInstrumentation = (req, res, next) => {
     type = 'json';
   } else if (req.method === 'POST' && req.originalUrl === '/upload') {
     type = 'image';
-  }
+
 
   if (!type) {
     return next();
