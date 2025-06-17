@@ -1,10 +1,10 @@
 import request from 'supertest';
-import { get, remove, set } from '../../src/aws';
+import { get, remove, set } from '../../src/helpers/aws';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
 describe('GET /ipfs/:cid', () => {
-  describe('when the IPFS cid exists', () => {
+  describe('when the gateway IPFS cid exists', () => {
     const cid = 'bafkreib5epjzumf3omr7rth5mtcsz4ugcoh3ut4d46hx5xhwm4b3pqr2vi';
     const path = `/ipfs/${cid}`;
     const content = { status: 'OK' };
@@ -53,6 +53,19 @@ describe('GET /ipfs/:cid', () => {
 
       expect(response.statusCode).toBe(415);
     }, 30e3);
+  });
+
+  describe('when the graph IPFS cid exists', () => {
+    const cid = 'QmPNovEZcmHT6yBd8BtzrELr1XrskrL3sMRGcV8PN3EfJX';
+    const path = `/ipfs/${cid}`;
+
+    it('returns the file', async () => {
+      const response = await request(HOST).get(path);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+      expect(response.body).toMatchSnapshot();
+    });
   });
 
   describe('when the IPFS cid does not exist', () => {

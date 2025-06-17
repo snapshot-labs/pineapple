@@ -3,10 +3,10 @@ import { fallbackLogger, initLogger } from '@snapshot-labs/snapshot-sentry';
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
-import initMetrics from './metrics';
-import proxy from './proxy';
-import rpc from './rpc';
-import upload from './upload';
+import initMetrics from './helpers/metrics';
+import proxy from './routes/proxy';
+import uploadImage from './routes/uploadImage';
+import uploadJson from './routes/uploadJson';
 import { version } from '../package.json';
 
 const app = express();
@@ -23,8 +23,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '4mb', extended: false }));
 app.use(cors({ maxAge: 86400 }));
 app.use(compression());
-app.use('/', rpc);
-app.use('/', upload);
+app.use('/', uploadJson);
+app.use('/', uploadImage);
 app.use('/', proxy);
 app.get('/', (req, res) => res.json({ version: v, port: PORT }));
 

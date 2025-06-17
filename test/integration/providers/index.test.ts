@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import * as FourEverland from '../../../src/providers/4everland';
-import * as Fleek from '../../../src/providers/fleek';
-import * as Pinata from '../../../src/providers/pinata';
+import * as FourEverland from '../../../src/providers/ipfs/4everland';
+import * as Fleek from '../../../src/providers/ipfs/fleek';
+import * as Pinata from '../../../src/providers/ipfs/pinata';
 
 describe('providers', () => {
   jest.retryTimes(2);
@@ -27,7 +27,7 @@ describe('providers', () => {
 
   function buildProviderPayload(providers, version) {
     return providers.map(p => ({
-      name: p.provider,
+      name: p.id,
       provider: p,
       idVersion: version
     }));

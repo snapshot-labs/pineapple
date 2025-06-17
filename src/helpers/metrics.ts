@@ -1,8 +1,10 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express } from 'express';
-import gateways from './gateways.json';
-import { IMAGE_PROVIDERS, JSON_PROVIDERS, providersMap } from './providers/utils';
+import ipfsProviders, {
+  IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS,
+  JSON_PROVIDERS as IPFS_JSON_PROVIDERS
+} from '../providers/ipfs/';
 
 export default function initMetrics(app: Express) {
   init(app, {
@@ -14,23 +16,17 @@ export default function initMetrics(app: Express) {
   app.use(providersInstrumentation);
 }
 
-const gatewaysCount = new client.Gauge({
-  name: 'ipfs_gateways_count',
-  help: 'Number of IPFS gateways.'
-});
-gatewaysCount.set(gateways.length);
-
 const providersJsonCount = new client.Gauge({
   name: 'providers_json_count',
   help: 'Number of providers used for JSON pinning.'
 });
-providersJsonCount.set(JSON_PROVIDERS.filter(p => providersMap[p].isConfigured()).length);
+providersJsonCount.set(IPFS_JSON_PROVIDERS.filter(p => ipfsProviders[p].isConfigured()).length);
 
 const providersImageCount = new client.Gauge({
   name: 'providers_image_count',
   help: 'Number of providers used for image pinning.'
 });
-providersImageCount.set(IMAGE_PROVIDERS.filter(p => providersMap[p].isConfigured()).length);
+providersImageCount.set(IPFS_IMAGE_PROVIDERS.filter(p => ipfsProviders[p].isConfigured()).length);
 
 export const timeProvidersUpload = new client.Histogram({
   name: 'providers_upload_duration_seconds',
@@ -51,28 +47,28 @@ const providersReturnCount = new client.Counter({
   labelNames: ['name', 'type']
 });
 
-export const timeIpfsGatewaysResponse = new client.Histogram({
-  name: 'ipfs_gateways_response_duration_seconds',
-  help: "Duration in seconds of each IPFS gateway's reponse.",
+export const timeProxyResponse = new client.Histogram({
+  name: 'proxy_response_duration_seconds',
+  help: "Duration in seconds of each proxy's response.",
   labelNames: ['name', 'status'],
   buckets: [0.5, 1, 2, 5, 10, 15]
 });
 
-export const ipfsGatewaysReturnCount = new client.Counter({
-  name: 'ipfs_gateways_return_count',
-  help: 'Number of times each gateway have been used.',
+export const proxyReturnCount = new client.Counter({
+  name: 'proxy_return_count',
+  help: 'Number of times each proxy have been used.',
   labelNames: ['name']
 });
 
-export const ipfsGatewaysCacheHitCount = new client.Counter({
-  name: 'ipfs_gateways_cache_hit_count',
-  help: 'Number of hit/miss of the IPFS gateways cache layer',
+export const proxyCacheHitCount = new client.Counter({
+  name: 'proxy_cache_hit_count',
+  help: 'Number of hit/miss of the proxy cache layer',
   labelNames: ['status']
 });
 
-export const ipfsGatewaysCacheSize = new client.Counter({
-  name: 'ipfs_gateways_cache_size',
-  help: 'Total size going through the IPFS gateways cache layer',
+export const proxyCacheSize = new client.Counter({
+  name: 'proxy_cache_size',
+  help: 'Total size going through the proxy cache layer',
   labelNames: ['status']
 });
 
@@ -82,9 +78,9 @@ export const countOpenProvidersRequest = new client.Gauge({
   labelNames: ['name', 'type']
 });
 
-export const countOpenGatewaysRequest = new client.Gauge({
-  name: 'ipfs_gateways_open_connections_count',
-  help: 'Number of open connections to gateways.',
+export const countOpenProxyRequest = new client.Gauge({
+  name: 'proxy_open_connections_count',
+  help: 'Number of open connections to proxies.',
   labelNames: ['name']
 });
 

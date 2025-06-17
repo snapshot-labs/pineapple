@@ -1,9 +1,9 @@
 import fleek from '@fleekhq/fleek-storage-js';
-import { sha256 } from '../utils';
+import { sha256 } from '../../helpers/utils';
 
 const { FLEEK_API_KEY, FLEEK_API_SECRET } = process.env;
 
-export const provider = 'fleek';
+export const id = 'fleek';
 const config: any = {
   apiKey: FLEEK_API_KEY,
   apiSecret: FLEEK_API_SECRET
@@ -16,9 +16,9 @@ export async function set(data: Buffer | object) {
   const result = await fleek.upload(input);
   const cid = result.hashV0;
 
-  return { cid, provider };
+  return { cid, provider: id };
 }
 
-export function isConfigured() {
-  return FLEEK_API_KEY && FLEEK_API_SECRET;
+export function isConfigured(): boolean {
+  return !!(FLEEK_API_KEY && FLEEK_API_SECRET);
 }

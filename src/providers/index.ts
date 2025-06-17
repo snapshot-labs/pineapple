@@ -1,42 +1,63 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { providersMap } from './utils';
-import { countOpenProvidersRequest, providersUploadSize, timeProvidersUpload } from '../metrics';
-type ProviderType = 'image' | 'json';
+import ipfsProviders, {
+  IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS,
+  JSON_PROVIDERS as IPFS_JSON_PROVIDERS
+} from './ipfs';
+import { Protocol, ProviderMap, UploadOptions } from './types';
+import {
+  countOpenProvidersRequest,
+  providersUploadSize,
+  timeProvidersUpload
+} from '../helpers/metrics';
 
-export default function uploadToProviders(providers: string[], type: ProviderType, params: any) {
-  const configuredProviders = providers.filter(p => providersMap[p].isConfigured());
+const PROVIDERS = {
+  ipfs: {
+    image: IPFS_IMAGE_PROVIDERS,
+    json: IPFS_JSON_PROVIDERS,
+    list: ipfsProviders as ProviderMap
+  }
+};
+
+export const DEFAULT_PROTOCOL: Protocol = 'ipfs';
+
+export default function uploadToProviders(
+  options: UploadOptions
+): Promise<{ cid: string; provider: string }> {
+  const { protocol, type, params, customProviderIds } = options;
+  const providerIds = customProviderIds || PROVIDERS[protocol][type];
+  const configuredProviders = providerIds
+    .map(p => PROVIDERS[protocol].list[p])
+    .filter(p => p?.isConfigured());
 
   return Promise.any(
-    configuredProviders.map(async name => {
-      const type: ProviderType = params instanceof Buffer ? 'image' : 'json';
-      const end = timeProvidersUpload.startTimer({ name, type });
+    configuredProviders.map(async ({ id, set }) => {
+      const end = timeProvidersUpload.startTimer({ name: id, type });
       let status = 0;
 
       try {
-        countOpenProvidersRequest.inc({ name, type });
+        countOpenProvidersRequest.inc({ name: id, type });
 
-        const result = await providersMap[name].set(params);
+        const result = await set(params);
         const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
           .length;
-        providersUploadSize.inc({ name, type }, size);
+        providersUploadSize.inc({ name: id, type }, size);
         status = 1;
-        console.log(`JSON pinned: ${result.provider} - ${result.cid}`);
 
         return result;
       } catch (e: any) {
         if (e instanceof Error) {
           if (e.message !== 'Request timed out') {
-            capture(e, { name });
+            capture(e, { name: id });
           }
         } else {
-          capture(new Error(`Error from ${name} provider`), {
+          capture(new Error(`Error from ${id} provider`), {
             contexts: { provider_response: e }
           });
         }
         return Promise.reject(e);
       } finally {
         end({ status });
-        countOpenProvidersRequest.dec({ name, type });
+        countOpenProvidersRequest.dec({ name: id, type });
       }
     })
   );

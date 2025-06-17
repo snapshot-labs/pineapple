@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GET /ipfs/:cid when the graph IPFS cid exists returns the file 1`] = `
+{
+  "tree": [
+    {
+      "address": "0x91FD2c8d24767db4Ece7069AA27832ffaf8590f3",
+      "votingPower": "1",
+    },
+  ],
+}
+`;

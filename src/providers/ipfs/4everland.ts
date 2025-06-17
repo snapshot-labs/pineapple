@@ -1,9 +1,9 @@
 import { S3 } from '@aws-sdk/client-s3';
-import { sha256 } from '../utils';
+import { sha256 } from '../../helpers/utils';
 
 const { EVER_API_KEY, EVER_API_SECRET } = process.env;
 
-export const provider = '4everland';
+export const id = '4everland';
 const client = new S3({
   endpoint: 'https://endpoint.4everland.co',
   region: 'eu-west-2',
@@ -27,9 +27,9 @@ export async function set(data: Buffer | object) {
   const result = await client.headObject(params);
   const cid = JSON.parse(result.ETag || 'null');
 
-  return { cid, provider };
+  return { cid, provider: id };
 }
 
-export function isConfigured() {
-  return EVER_API_KEY && EVER_API_SECRET;
+export function isConfigured(): boolean {
+  return !!(EVER_API_KEY && EVER_API_SECRET);
 }

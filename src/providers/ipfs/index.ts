@@ -10,7 +10,7 @@ export const IMAGE_PROVIDERS = ['fleek', 'infura', 'pinata', '4everland'];
 // List of providers used for pinning json
 export const JSON_PROVIDERS = ['fleek', 'infura', 'web3storage', '4everland'];
 
-export const providersMap = {
+export default {
   fleek,
   infura,
   pinata,

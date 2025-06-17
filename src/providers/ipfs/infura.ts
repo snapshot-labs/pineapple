@@ -2,7 +2,7 @@ import { create } from 'ipfs-http-client';
 
 const { INFURA_PROJECT_ID, INFURA_PROJECT_SECRET } = process.env;
 
-export const provider = 'infura';
+export const id = 'infura';
 const client = create({
   host: 'ipfs.infura.io',
   port: 5001,
@@ -22,9 +22,9 @@ export async function set(data: Buffer | object) {
   });
   const cid = result.cid.toV0().toString();
 
-  return { cid, provider };
+  return { cid, provider: id };
 }
 
-export function isConfigured() {
-  return INFURA_PROJECT_ID && INFURA_PROJECT_SECRET;
+export function isConfigured(): boolean {
+  return !!(INFURA_PROJECT_ID && INFURA_PROJECT_SECRET);
 }

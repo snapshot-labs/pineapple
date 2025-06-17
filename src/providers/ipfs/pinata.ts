@@ -4,7 +4,7 @@ import pinataSDK from '@pinata/sdk';
 
 const { PINATA_API_KEY, PINATA_API_SECRET } = process.env;
 
-export const provider = 'pinata';
+export const id = 'pinata';
 const client = pinataSDK(PINATA_API_KEY || '', PINATA_API_SECRET || '');
 
 export async function set(data: Buffer | object) {
@@ -20,9 +20,9 @@ export async function set(data: Buffer | object) {
 
   const cid = result.IpfsHash;
 
-  return { cid, provider };
+  return { cid, provider: id };
 }
 
-export function isConfigured() {
-  return PINATA_API_KEY && PINATA_API_SECRET;
+export function isConfigured(): boolean {
+  return !!(PINATA_API_KEY && PINATA_API_SECRET);
 }

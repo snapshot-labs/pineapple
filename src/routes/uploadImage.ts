@@ -3,9 +3,8 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
 import multer from 'multer';
 import sharp from 'sharp';
-import uploadToProviders from './providers/';
-import { IMAGE_PROVIDERS } from './providers/utils';
-import { rpcError, rpcSuccess } from './utils';
+import { rpcError, rpcSuccess } from '../helpers/utils';
+import uploadToProviders, { DEFAULT_PROTOCOL } from '../providers/';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1500;
@@ -22,6 +21,8 @@ router.post('/upload', async (req, res) => {
       if (err) return rpcError(res, 400, err.message);
       if (!req.file) return rpcError(res, 400, 'No file submitted');
 
+      const { protocol = DEFAULT_PROTOCOL } = req.body;
+
       const transformer = sharp()
         .resize({
           width: MAX_IMAGE_DIMENSION,
@@ -35,7 +36,11 @@ router.post('/upload', async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', buffer);
+      const result = await uploadToProviders({
+        protocol,
+        type: 'image',
+        params: buffer
+      });
       const file = {
         cid: result.cid,
         provider: result.provider
