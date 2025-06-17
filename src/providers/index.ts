@@ -3,6 +3,10 @@ import ipfsProviders, {
   IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS,
   JSON_PROVIDERS as IPFS_JSON_PROVIDERS
 } from './ipfs';
+import swarmProviders, {
+  IMAGE_PROVIDERS as SWARM_IMAGE_PROVIDERS,
+  JSON_PROVIDERS as SWARM_JSON_PROVIDERS
+} from './swarm';
 import { Protocol, ProviderMap, UploadOptions } from './types';
 import {
   countOpenProvidersRequest,
@@ -16,6 +20,11 @@ const PROVIDERS = {
     image: IPFS_IMAGE_PROVIDERS,
     json: IPFS_JSON_PROVIDERS,
     list: ipfsProviders as ProviderMap
+  },
+  swarm: {
+    image: SWARM_IMAGE_PROVIDERS,
+    json: SWARM_JSON_PROVIDERS,
+    list: swarmProviders as ProviderMap
   }
 };
 

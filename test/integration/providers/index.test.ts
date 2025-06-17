@@ -1,8 +1,16 @@
 import fs from 'fs';
 import path from 'path';
-import * as FourEverland from '../../../src/providers/ipfs/4everland';
-import * as Fleek from '../../../src/providers/ipfs/fleek';
-import * as Pinata from '../../../src/providers/ipfs/pinata';
+import ipfsProviders from '../../../src/providers/ipfs';
+import swarmProviders from '../../../src/providers/swarm';
+
+const providers = {
+  ...ipfsProviders,
+  ...swarmProviders
+};
+
+const jsonProviders = [providers.fleek, providers.pinata, providers['4everland'], providers.swarmy];
+
+const imageProviders = [providers.fleek, providers.pinata, providers['4everland']];
 
 describe('providers', () => {
   jest.retryTimes(2);
@@ -13,7 +21,8 @@ describe('providers', () => {
     },
     output: {
       v0: 'QmTJzHxw4pPgcv6ZtA7hm9L32Evr2Z6A1LoEuTp9UGZC2n',
-      v1: 'bafkreib5epjzumf3omr7rth5mtcsz4ugcoh3ut4d46hx5xhwm4b3pqr2vi'
+      v1: 'bafkreib5epjzumf3omr7rth5mtcsz4ugcoh3ut4d46hx5xhwm4b3pqr2vi',
+      swarm: '2f897e39ca12b83795d167384f87da2b4bc4ebab70755bfa2933496a4e5cb5c7'
     }
   };
 
@@ -34,26 +43,42 @@ describe('providers', () => {
   }
 
   const providerPayload: { name: string; provider: any; idVersion: string }[] =
-    buildProviderPayload([Fleek, Pinata], 'v0').concat(buildProviderPayload([FourEverland], 'v1'));
+    buildProviderPayload([providers.fleek, providers.pinata], 'v0')
+      .concat(buildProviderPayload([providers['4everland']], 'v1'))
+      .concat(buildProviderPayload([providers.swarmy], 'swarm'));
 
   describe.each(providerPayload)('$name', ({ name, provider, idVersion }) => {
     if (!provider.isConfigured()) {
       it.todo(`needs to set credentials for ${name}`);
     } else {
-      it('should upload a JSON file', async () => {
-        const result = await provider.set(json.input);
+      const shouldTestJson = jsonProviders.includes(provider);
+      const jsonTest = shouldTestJson ? it : it.skip;
 
-        expect(result.provider).toBe(name);
-        expect(result.cid).toBe(json.output[idVersion]);
-      }, 20e3);
+      jsonTest(
+        'should upload a JSON file',
+        async () => {
+          const result = await provider.set(json.input);
 
-      it('should upload an image file', async () => {
-        const buffer = await image.input;
-        const result = await provider.set(buffer);
+          expect(result.provider).toBe(name);
+          expect(result.cid).toBe(json.output[idVersion]);
+        },
+        20e3
+      );
 
-        expect(result.provider).toBe(name);
-        expect(result.cid).toBe(image.output[idVersion]);
-      }, 20e3);
+      const shouldTestImage = imageProviders.includes(provider);
+      const imageTest = shouldTestImage ? it : it.skip;
+
+      imageTest(
+        'should upload an image file',
+        async () => {
+          const buffer = await image.input;
+          const result = await provider.set(buffer);
+
+          expect(result.provider).toBe(name);
+          expect(result.cid).toBe(image.output[idVersion]);
+        },
+        20e3
+      );
     }
   });
 });

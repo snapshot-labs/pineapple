@@ -1,11 +1,13 @@
 import ipfsProxies from './ipfs';
+import swarmProxies from './swarm';
 import { Protocol, ProxiesMap, Response } from './types';
 import { countOpenProxyRequest, proxyReturnCount, timeProxyResponse } from '../helpers/metrics';
 
 export const UNSUPPORTED_FILE_TYPE_ERROR = 'unsupported file type';
 
 const PROXIES: Record<Protocol, ProxiesMap> = {
-  ipfs: ipfsProxies
+  ipfs: ipfsProxies,
+  swarm: swarmProxies
 };
 
 export function resolveFromProxies(protocol: Protocol, hash: string): Promise<Response> {

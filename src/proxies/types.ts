@@ -8,6 +8,6 @@ export interface Proxy {
   id: string;
 }
 
-export type Protocol = 'ipfs';
+export type Protocol = 'ipfs' | 'swarm';
 
 export type ProxiesMap = Record<string, Proxy>;
