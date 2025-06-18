@@ -29,6 +29,10 @@ export default function uploadToProviders(
     .map(p => PROVIDERS[protocol].list[p])
     .filter(p => p?.isConfigured());
 
+  if (configuredProviders.length === 0) {
+    throw new Error(`No configured providers available for ${protocol}/${type}`);
+  }
+
   return Promise.any(
     configuredProviders.map(async ({ id, set }) => {
       const end = timeProvidersUpload.startTimer({ name: id, type });
