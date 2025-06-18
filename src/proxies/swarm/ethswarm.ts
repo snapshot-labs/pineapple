@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
 import { UNSUPPORTED_FILE_TYPE_ERROR } from '..';
+import { isJsonContentType } from '../../helpers/utils';
 
 const TIMEOUT = 15e3;
-const SUPPORTED_CONTENT_TYPES = ['text/plain', 'application/json'] as const;
 
 export const id = 'swarmy';
 
@@ -15,8 +15,7 @@ export async function resolve(hash: string): Promise<any> {
     return Promise.reject(response.status);
   }
 
-  const contentType = response.headers.get('content-type')?.split(';')[0];
-  if (!contentType || !SUPPORTED_CONTENT_TYPES.includes(contentType as any)) {
+  if (!isJsonContentType(response.headers.get('content-type'))) {
     return Promise.reject(UNSUPPORTED_FILE_TYPE_ERROR);
   }
 

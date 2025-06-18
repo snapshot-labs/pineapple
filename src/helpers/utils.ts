@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 import { Response } from 'express';
 
 export const MAX = 20e10; // 20 MB
+const JSON_CONTENT_TYPES = ['text/plain', 'application/json'] as const;
 
 export function rpcSuccess(res: Response, result: any, id = '') {
   res.json({
@@ -24,7 +25,18 @@ export function rpcError(res: Response, code: number, e: Error | string, id = nu
 }
 
 export function sha256(input: string | Buffer) {
-  return createHash('sha256').update(input).digest('hex');
+  return createHash('sha256')
+    .update(input as any)
+    .digest('hex');
+}
+
+export function isJsonContentType(contentType: string | null): boolean {
+  if (!contentType) {
+    return false;
+  }
+
+  const mainContentType = contentType.split(';')[0].trim();
+  return JSON_CONTENT_TYPES.some(supportedType => mainContentType === supportedType);
 }
 
 export function getJsonSize(data: any): number {
