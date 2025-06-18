@@ -20,21 +20,21 @@ export function resolveFromProxies(protocol: Protocol, hash: string): Promise<Re
     const promises = Array.isArray(resolveResult) ? resolveResult : [resolveResult];
 
     return promises.map(async promise => {
-      const end = timeProxyResponse.startTimer({ name: proxy.id });
+      const end = timeProxyResponse.startTimer({ name: proxy.id, protocol });
       let status = 0;
 
       try {
-        countOpenProxyRequest.inc({ name: proxy.id });
+        countOpenProxyRequest.inc({ name: proxy.id, protocol });
 
         const result = await promise;
         status = 1;
 
-        proxyReturnCount.inc({ name: proxy.id });
+        proxyReturnCount.inc({ name: proxy.id, protocol });
 
         return result;
       } finally {
-        end({ status });
-        countOpenProxyRequest.dec({ name: proxy.id });
+        end({ status, protocol });
+        countOpenProxyRequest.dec({ name: proxy.id, protocol });
       }
     });
   });

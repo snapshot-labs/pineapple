@@ -8,13 +8,13 @@ import { getJsonSize, MAX } from '../helpers/utils';
  * and caches its results if it's less than 1MB
  */
 export default async function useProxyCache(req, res, next) {
-  const { cid } = req.params;
+  const { cid, protocol } = req.params;
 
   const cache = await get(cid);
   if (cache) {
     const cachedSize = getJsonSize(cache);
-    proxyCacheHitCount.inc({ status: 'HIT' });
-    proxyCacheSize.inc({ status: 'HIT' }, cachedSize);
+    proxyCacheHitCount.inc({ status: 'HIT', protocol });
+    proxyCacheSize.inc({ status: 'HIT', protocol }, cachedSize);
     return res.json(cache);
   }
 
@@ -26,8 +26,8 @@ export default async function useProxyCache(req, res, next) {
       try {
         const size = getJsonSize(body);
         if (size <= MAX) {
-          proxyCacheHitCount.inc({ status: 'MISS' });
-          proxyCacheSize.inc({ status: 'MISS' }, size);
+          proxyCacheHitCount.inc({ status: 'MISS', protocol });
+          proxyCacheSize.inc({ status: 'MISS', protocol }, size);
           await set(cid, body);
         }
       } catch (e) {

@@ -4,7 +4,7 @@ import { isJsonContentType } from '../../helpers/utils';
 
 const TIMEOUT = 15e3;
 
-export const id = 'swarmy';
+export const id = 'ethswarm';
 
 export async function resolve(hash: string): Promise<any> {
   const response = await fetch(`https://api.gateway.ethswarm.org/bzz/${hash}`, {

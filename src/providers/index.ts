@@ -15,7 +15,7 @@ import {
 } from '../helpers/metrics';
 import { getDataSize } from '../helpers/utils';
 
-const PROVIDERS = {
+export const PROVIDERS = {
   ipfs: {
     image: IPFS_IMAGE_PROVIDERS,
     json: IPFS_JSON_PROVIDERS,
@@ -45,15 +45,15 @@ export default function uploadToProviders(
 
   return Promise.any(
     configuredProviders.map(async ({ id, set }) => {
-      const end = timeProvidersUpload.startTimer({ name: id, type });
+      const end = timeProvidersUpload.startTimer({ name: id, type, protocol });
       let status = 0;
 
       try {
-        countOpenProvidersRequest.inc({ name: id, type });
+        countOpenProvidersRequest.inc({ name: id, type, protocol });
 
         const result = await set(params);
         const size = getDataSize(params);
-        providersUploadSize.inc({ name: id, type }, size);
+        providersUploadSize.inc({ name: id, type, protocol }, size);
         status = 1;
 
         return result;
@@ -69,8 +69,8 @@ export default function uploadToProviders(
         }
         return Promise.reject(e);
       } finally {
-        end({ status });
-        countOpenProvidersRequest.dec({ name: id, type });
+        end({ status, protocol });
+        countOpenProvidersRequest.dec({ name: id, type, protocol });
       }
     })
   );
