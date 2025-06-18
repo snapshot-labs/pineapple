@@ -32,7 +32,7 @@ export function resolve(cid: string): Promise<Response>[] {
 
     try {
       const json = await response.json();
-      return { proxy: gateway, json };
+      return { proxy: id, json };
     } catch (e: any) {
       return Promise.reject(e);
     }
