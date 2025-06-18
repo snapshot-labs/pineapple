@@ -26,7 +26,8 @@ export function resolve(cid: string): Promise<Response>[] {
       return Promise.reject(response.status);
     }
 
-    if (!SUPPORTED_CONTENT_TYPES.includes(response.headers.get('content-type'))) {
+    const contentType = response.headers.get('content-type')?.split(';')[0];
+    if (!contentType || !SUPPORTED_CONTENT_TYPES.includes(contentType as any)) {
       return Promise.reject(UNSUPPORTED_FILE_TYPE_ERROR);
     }
 
