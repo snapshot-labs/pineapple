@@ -19,6 +19,7 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+      SWARM_API_KEY: ${{ secrets.SWARM_API_KEY }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
