@@ -56,7 +56,7 @@ router.post('/upload', async (req, res) => {
       return rpcError(res, 500, e);
     } finally {
       if (req.file) {
-        await fs.promises.unlink(req.file.path as string);
+        await fs.promises.unlink(req.file.path);
       }
     }
   });
