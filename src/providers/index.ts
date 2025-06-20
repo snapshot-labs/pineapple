@@ -26,7 +26,7 @@ export const PROVIDERS = {
     json: SWARM_JSON_PROVIDERS,
     list: swarmProviders as ProviderMap
   }
-};
+} as const;
 
 export const DEFAULT_PROTOCOL: Protocol = 'ipfs';
 

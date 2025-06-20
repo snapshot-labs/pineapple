@@ -5,10 +5,10 @@ import * as pinata from './pinata';
 import * as web3storage from './web3storage';
 
 // List of providers used for pinning images
-export const IMAGE_PROVIDERS = ['fleek', 'infura', 'pinata', '4everland'];
+export const IMAGE_PROVIDERS = ['fleek', 'infura', 'pinata', '4everland'] as const;
 
 // List of providers used for pinning json
-export const JSON_PROVIDERS = ['fleek', 'infura', 'web3storage', '4everland'];
+export const JSON_PROVIDERS = ['fleek', 'infura', 'web3storage', '4everland'] as const;
 
 export default {
   fleek,

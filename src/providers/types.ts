@@ -1,5 +1,5 @@
 export type ProviderType = 'image' | 'json';
-export type Protocol = 'ipfs';
+export type Protocol = 'ipfs' | 'swarm';
 export type UploadData = Buffer | object;
 
 export interface Provider {
