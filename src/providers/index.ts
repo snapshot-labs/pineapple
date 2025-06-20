@@ -9,6 +9,7 @@ import {
   providersUploadSize,
   timeProvidersUpload
 } from '../helpers/metrics';
+import { getDataSize } from '../helpers/utils';
 
 const PROVIDERS = {
   ipfs: {
@@ -42,8 +43,7 @@ export default function uploadToProviders(
         countOpenProvidersRequest.inc({ name: id, type });
 
         const result = await set(params);
-        const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
-          .length;
+        const size = getDataSize(params);
         providersUploadSize.inc({ name: id, type }, size);
         status = 1;
 

@@ -26,3 +26,11 @@ export function rpcError(res: Response, code: number, e: Error | string, id = nu
 export function sha256(input: string | Buffer) {
   return createHash('sha256').update(input).digest('hex');
 }
+
+export function getJsonSize(data: any): number {
+  return Buffer.from(JSON.stringify(data)).length;
+}
+
+export function getDataSize(data: Buffer | any): number {
+  return data instanceof Buffer ? data.length : getJsonSize(data);
+}

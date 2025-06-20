@@ -1,7 +1,7 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { get, set } from '../helpers/aws';
 import { proxyCacheHitCount, proxyCacheSize } from '../helpers/metrics';
-import { MAX } from '../helpers/utils';
+import { getJsonSize, MAX } from '../helpers/utils';
 
 /**
  * This middleware serves a cache if it exists, else it will process the controller
@@ -12,7 +12,7 @@ export default async function useProxyCache(req, res, next) {
 
   const cache = await get(cid);
   if (cache) {
-    const cachedSize = Buffer.from(JSON.stringify(cache)).length;
+    const cachedSize = getJsonSize(cache);
     proxyCacheHitCount.inc({ status: 'HIT' });
     proxyCacheSize.inc({ status: 'HIT' }, cachedSize);
     return res.json(cache);
@@ -24,7 +24,7 @@ export default async function useProxyCache(req, res, next) {
 
     if (res.statusCode === 200 && body) {
       try {
-        const size = Buffer.from(JSON.stringify(body)).length;
+        const size = getJsonSize(body);
         if (size <= MAX) {
           proxyCacheHitCount.inc({ status: 'MISS' });
           proxyCacheSize.inc({ status: 'MISS' }, size);
