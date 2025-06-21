@@ -76,3 +76,64 @@ describe('GET /ipfs/:cid', () => {
     }, 30e3);
   });
 });
+
+describe('GET /swarm/:cid', () => {
+  describe('when the swarm cid exists', () => {
+    const cid = '2f897e39ca12b83795d167384f87da2b4bc4ebab70755bfa2933496a4e5cb5c7';
+    const path = `/swarm/${cid}`;
+    const content = { status: 'OK' };
+
+    afterEach(async () => {
+      await remove(cid);
+    });
+
+    describe('when the file is cached', () => {
+      if (process.env.AWS_REGION) {
+        const cachedContent = { status: 'CACHED' };
+
+        it('returns the cache file', async () => {
+          await set(cid, cachedContent);
+          const response = await request(HOST).get(path);
+
+          expect(response.body).toEqual(cachedContent);
+          expect(response.statusCode).toBe(200);
+          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+          expect(await get(cid)).toEqual(cachedContent);
+        });
+      } else {
+        it.todo('needs to set AWS credentials to test the cache');
+      }
+    });
+
+    describe('when the file is not cached', () => {
+      if (process.env.AWS_REGION) {
+        it('returns the file and caches it', async () => {
+          const response = await request(HOST).get(path);
+
+          expect(response.body).toEqual(content);
+          expect(response.statusCode).toBe(200);
+          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+          expect(await get(cid)).toEqual(response.body);
+        });
+      } else {
+        it.todo('needs to set AWS credentials to test the cache');
+      }
+    });
+
+    it('returns the file from swarm gateway', async () => {
+      const response = await request(HOST).get(path);
+
+      expect(response.body).toEqual(content);
+      expect(response.statusCode).toBe(200);
+      expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+    }, 30e3);
+  });
+
+  describe('when the swarm cid does not exist', () => {
+    it('returns a 400 error', async () => {
+      const response = await request(HOST).get('/swarm/invalidhash');
+
+      expect(response.statusCode).toBe(400);
+    }, 30e3);
+  });
+});
