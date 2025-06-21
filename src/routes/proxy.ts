@@ -7,7 +7,7 @@ import { Protocol } from '../proxies/types';
 const router = express.Router();
 
 router.get<{ protocol: Protocol; cid: string }>(
-  '^/:protocol(ipfs)/:cid([0-9a-zA-Z]+)$',
+  '^/:protocol(ipfs|swarm)/:cid([0-9a-zA-Z]+)$',
   useProxyCache,
   async (req, res) => {
     try {
