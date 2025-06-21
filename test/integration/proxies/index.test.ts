@@ -16,7 +16,7 @@ describe('proxies', () => {
       proxy: proxies.gateway,
       cid: 'bafkreib5epjzumf3omr7rth5mtcsz4ugcoh3ut4d46hx5xhwm4b3pqr2vi',
       content: { status: 'OK' },
-      resolveMethod: (cid: string) => Promise.any(proxies.gateway.resolve(cid)),
+      resolveMethod: (cid: string) => proxies.gateway.resolve(cid),
       invalidInput: 'invalidcid',
       description: 'IPFS gateways'
     },

@@ -42,36 +42,29 @@ Object.entries(PROVIDERS).forEach(([protocol, config]) => {
   );
 });
 
-export const timeProvidersUpload = new client.Histogram({
-  name: 'providers_upload_duration_seconds',
-  help: "Duration in seconds of provider's upload requests.",
-  labelNames: ['name', 'type', 'status', 'protocol'],
+export const serviceDuration = new client.Histogram({
+  name: 'service_duration_seconds',
+  help: 'Duration in seconds of service requests (providers/proxies).',
+  labelNames: ['name', 'service_type', 'operation_type', 'status', 'protocol'],
   buckets: DURATION_BUCKETS
 });
 
-export const providersUploadSize = new client.Counter({
-  name: 'providers_upload_size',
-  help: "Total size of each provider's upload file.",
-  labelNames: ['name', 'type', 'protocol']
+export const serviceOpenConnections = new client.Gauge({
+  name: 'service_open_connections_count',
+  help: 'Number of open connections to services (providers/proxies).',
+  labelNames: ['name', 'service_type', 'operation_type', 'protocol']
 });
 
-const providersReturnCount = new client.Counter({
-  name: 'providers_return_count',
-  help: 'Number of times each provider have been used.',
-  labelNames: ['name', 'type', 'protocol']
+export const serviceSize = new client.Counter({
+  name: 'service_size_bytes',
+  help: 'Total size of data processed by services (providers/proxies).',
+  labelNames: ['name', 'service_type', 'operation_type', 'protocol']
 });
 
-export const timeProxyResponse = new client.Histogram({
-  name: 'proxy_response_duration_seconds',
-  help: "Duration in seconds of each proxy's response.",
-  labelNames: ['name', 'status', 'protocol'],
-  buckets: DURATION_BUCKETS
-});
-
-export const proxyReturnCount = new client.Counter({
-  name: 'proxy_return_count',
-  help: 'Number of times each proxy have been used.',
-  labelNames: ['name', 'protocol']
+export const serviceReturnCount = new client.Counter({
+  name: 'service_return_count',
+  help: 'Number of times each service (provider/proxy) has been used.',
+  labelNames: ['name', 'service_type', 'operation_type', 'protocol']
 });
 
 export const proxyCacheHitCount = new client.Counter({
@@ -84,18 +77,6 @@ export const proxyCacheSize = new client.Counter({
   name: 'proxy_cache_size',
   help: 'Total size going through the proxy cache layer',
   labelNames: ['status', 'protocol']
-});
-
-export const countOpenProvidersRequest = new client.Gauge({
-  name: 'providers_open_connections_count',
-  help: 'Number of open connections to providers.',
-  labelNames: ['name', 'type', 'protocol']
-});
-
-export const countOpenProxyRequest = new client.Gauge({
-  name: 'proxy_open_connections_count',
-  help: 'Number of open connections to proxies.',
-  labelNames: ['name', 'protocol']
 });
 
 const providersInstrumentation = (req: any, res: any, next: any) => {
@@ -114,7 +95,12 @@ const providersInstrumentation = (req: any, res: any, next: any) => {
   res.json = (body: any) => {
     if (res.statusCode === 200 && body) {
       const protocol = req.body?.protocol || 'ipfs';
-      providersReturnCount.inc({ name: body.result?.provider || body.provider, type, protocol });
+      serviceReturnCount.inc({
+        name: body.result?.provider || body.provider,
+        service_type: 'provider',
+        operation_type: type,
+        protocol
+      });
     }
 
     res.locals.body = body;

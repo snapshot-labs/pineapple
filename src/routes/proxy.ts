@@ -11,7 +11,10 @@ router.get<{ protocol: Protocol; cid: string }>(
   useProxyCache,
   async (req, res) => {
     try {
-      const result = await resolveFromProxies(req.params.protocol, req.params.cid);
+      const result = await resolveFromProxies({
+        protocol: req.params.protocol,
+        hash: req.params.cid
+      });
 
       return res.json(result.json);
     } catch (e) {

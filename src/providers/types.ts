@@ -14,5 +14,4 @@ export interface UploadOptions {
   protocol: Protocol;
   type: ProviderType;
   params: UploadData;
-  customProviderIds?: string[];
 }

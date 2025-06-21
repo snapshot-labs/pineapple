@@ -1,7 +1,7 @@
 import ipfsProxies from './ipfs';
 import swarmProxies from './swarm';
-import { Protocol, ProxiesMap, Response } from './types';
-import { countOpenProxyRequest, proxyReturnCount, timeProxyResponse } from '../helpers/metrics';
+import { Protocol, ProxiesMap, ResolveOptions, Response } from './types';
+import { withServiceMetrics } from '../decorators';
 
 export const UNSUPPORTED_FILE_TYPE_ERROR = 'unsupported file type';
 
@@ -10,34 +10,22 @@ const PROXIES: Record<Protocol, ProxiesMap> = {
   swarm: swarmProxies
 };
 
-export function resolveFromProxies(protocol: Protocol, hash: string): Promise<Response> {
-  const proxies = Object.values(PROXIES[protocol]);
+function getConfiguredProxies(protocol: Protocol): Array<ReturnType<typeof withServiceMetrics>> {
+  return Object.values(PROXIES[protocol]).map(proxy =>
+    withServiceMetrics(proxy, 'resolve', {
+      protocol,
+      serviceType: 'proxy',
+      operationType: 'resolve'
+    })
+  );
+}
 
-  const allPromises = proxies.flatMap(proxy => {
-    const resolveResult = proxy.resolve(hash);
+export function resolveFromProxies({ protocol, hash }: ResolveOptions): Promise<Response> {
+  const configuredProxies = getConfiguredProxies(protocol);
 
-    // Handle both single promise and array of promises
-    const promises = Array.isArray(resolveResult) ? resolveResult : [resolveResult];
+  if (configuredProxies.length === 0) {
+    throw new Error(`No configured proxies available for protocol: ${protocol}`);
+  }
 
-    return promises.map(async promise => {
-      const end = timeProxyResponse.startTimer({ name: proxy.id, protocol });
-      let status = 0;
-
-      try {
-        countOpenProxyRequest.inc({ name: proxy.id, protocol });
-
-        const result = await promise;
-        status = 1;
-
-        proxyReturnCount.inc({ name: proxy.id, protocol });
-
-        return result;
-      } finally {
-        end({ status, protocol });
-        countOpenProxyRequest.dec({ name: proxy.id, protocol });
-      }
-    });
-  });
-
-  return Promise.any(allPromises);
+  return Promise.any(configuredProxies.map(proxy => proxy.resolve(hash)));
 }

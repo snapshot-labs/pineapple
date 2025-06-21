@@ -18,8 +18,8 @@ const TIMEOUT = 15e3;
 
 export const id = 'gateway';
 
-export function resolve(cid: string): Promise<Response>[] {
-  return GATEWAYS.map(async gateway => {
+export function resolve(cid: string): Promise<Response> {
+  const gatewayPromises = GATEWAYS.map(async gateway => {
     const response = await fetch(`https://${gateway}/ipfs/${cid}`, { timeout: TIMEOUT });
 
     if (!response.ok) {
@@ -37,4 +37,6 @@ export function resolve(cid: string): Promise<Response>[] {
       return Promise.reject(e);
     }
   });
+
+  return Promise.any(gatewayPromises);
 }
