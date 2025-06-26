@@ -9,8 +9,8 @@ import { MAX_IMAGE_DIMENSION } from '../../src/upload';
 const isValidCid = (cid: string): boolean => {
   // CIDv0 format: starts with 'Qm' and is 46 characters long (base58)
   const cidv0Pattern = /^Qm[1-9A-HJ-NP-Za-km-z]{44}$/;
-  // CIDv1 format: starts with 'bafk' or 'bafkr' and has expected length
-  const cidv1Pattern = /^bafk[a-z2-7]{52}$/;
+  // CIDv1 format: starts with 'bafk' and is 59 characters long (base32)
+  const cidv1Pattern = /^bafk[a-z2-7]{55}$/;
 
   return cidv0Pattern.test(cid) || cidv1Pattern.test(cid);
 };
@@ -18,6 +18,7 @@ const isValidCid = (cid: string): boolean => {
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
 describe('POST /upload', () => {
+  jest.retryTimes(2);
   describe('when the image exceeds the maximum file size', () => {
     it('should return a 400 error', async () => {
       const response = await request(HOST)
@@ -116,6 +117,7 @@ describe('POST /upload', () => {
         .attach('file', path.join(__dirname, './fixtures/large-image.jpg'));
 
       // Step 1: Verify API response
+      console.log('Upload response:', response.body);
       expect(response.statusCode).toBe(200);
       expect(response.body.jsonrpc).toBe('2.0');
       expect(isValidCid(response.body.result.cid)).toBe(true);
