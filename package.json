@@ -12,7 +12,8 @@
     "start:test": "dotenv -e test/.env.test yarn dev",
     "test": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test jest --runInBand'",
     "test:unit": "dotenv -e test/.env.test jest test/unit/",
-    "test:e2e": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'"
+    "test:e2e": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'",
+    "test:e2e:update-snapshots": "PORT=3003 start-server-and-test 'yarn start:test' 3003 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/ --updateSnapshot'"
   },
   "eslintConfig": {
     "extends": "@snapshot-labs"
@@ -48,6 +49,7 @@
     "eslint": "^8.45.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.6.2",
+    "jest-image-snapshot": "^6.5.1",
     "prettier": "^3.0.1",
     "start-server-and-test": "^2.0.0",
     "supertest": "^6.3.3",

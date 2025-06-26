@@ -17,7 +17,7 @@ describe('GET /ipfs/:cid', () => {
       if (process.env.AWS_REGION) {
         const cachedContent = { status: 'CACHED' };
 
-        it('returns the cache file', async () => {
+        it('should return the cached file', async () => {
           await set(cid, cachedContent);
           const response = await request(HOST).get(path);
 
@@ -33,7 +33,7 @@ describe('GET /ipfs/:cid', () => {
 
     describe('when the file is not cached', () => {
       if (process.env.AWS_REGION) {
-        it('returns the file and caches it', async () => {
+        it('should return the file and cache it', async () => {
           const response = await request(HOST).get(path);
 
           expect(response.body).toEqual(content);
@@ -46,7 +46,7 @@ describe('GET /ipfs/:cid', () => {
       }
     });
 
-    it('returns a 415 error when not a JSON file', async () => {
+    it('should return a 415 error when not a JSON file', async () => {
       const response = await request(HOST).get(
         '/ipfs/bafybeie2x4ptheqskiauhfz4w4pbq7o6742oupitganczhjanvffp2spti'
       );
@@ -56,7 +56,7 @@ describe('GET /ipfs/:cid', () => {
   });
 
   describe('when the IPFS cid does not exist', () => {
-    it('returns a 400 error', async () => {
+    it('should return a 400 error', async () => {
       const response = await request(HOST).get('/ipfs/test');
 
       expect(response.statusCode).toBe(400);
