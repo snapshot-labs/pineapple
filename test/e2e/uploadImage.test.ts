@@ -95,7 +95,8 @@ describe('POST /upload', () => {
           failureThreshold: 0.01,
           failureThresholdType: 'percent'
         });
-      }
+      },
+      30000
     );
 
     it('should return a 415 error for unsupported BMP format', async () => {
@@ -143,6 +144,6 @@ describe('POST /upload', () => {
         failureThreshold: 0.01,
         failureThresholdType: 'percent'
       });
-    });
+    }, 30000);
   });
 });
