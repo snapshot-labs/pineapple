@@ -7,8 +7,12 @@ import { MAX_IMAGE_DIMENSION } from '../../src/upload';
 
 // Helper function to validate CID format
 const isValidCid = (cid: string): boolean => {
+  // CIDv0 format: starts with 'Qm' and is 46 characters long (base58)
+  const cidv0Pattern = /^Qm[1-9A-HJ-NP-Za-km-z]{44}$/;
   // CIDv1 format: starts with 'bafk' or 'bafkr' and has expected length
-  return /^bafk[a-z2-7]{52}$/.test(cid);
+  const cidv1Pattern = /^bafk[a-z2-7]{52}$/;
+
+  return cidv0Pattern.test(cid) || cidv1Pattern.test(cid);
 };
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
