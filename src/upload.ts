@@ -26,7 +26,8 @@ router.post('/upload', async (req, res) => {
         .resize({
           width: MAX_IMAGE_DIMENSION,
           height: MAX_IMAGE_DIMENSION,
-          fit: 'inside'
+          fit: 'inside',
+          withoutEnlargement: true
         })
         .webp({ lossless: true });
 
