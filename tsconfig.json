@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "inlineSources": true,
-    "sourceRoot": "/"
+    "sourceRoot": "/",
+    "typeRoots": ["./node_modules/@types", "./test/setup"]
   }
 }

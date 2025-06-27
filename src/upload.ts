@@ -8,7 +8,7 @@ import { IMAGE_PROVIDERS } from './providers/utils';
 import { rpcError, rpcSuccess } from './utils';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
-const MAX_IMAGE_DIMENSION = 1500;
+export const MAX_IMAGE_DIMENSION = 1500;
 
 const router = express.Router();
 const upload = multer({
