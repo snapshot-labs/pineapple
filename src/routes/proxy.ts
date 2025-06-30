@@ -2,13 +2,13 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
 import { create } from 'ipfs-http-client';
 import fetch from 'node-fetch';
-import gateways from './gateways.json';
+import gateways from '../gateways.json';
 import {
   countOpenGatewaysRequest,
   ipfsGatewaysReturnCount,
   timeIpfsGatewaysResponse
-} from './metrics';
-import useProxyCache from './middlewares/useProxyCache';
+} from '../metrics';
+import useProxyCache from '../middlewares/useProxyCache';
 
 const UNSUPPORTED_FILE_TYPE = 'unsupported file type';
 

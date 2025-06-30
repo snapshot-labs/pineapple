@@ -3,9 +3,9 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
 import multer from 'multer';
 import sharp from 'sharp';
-import uploadToProviders from './providers/';
-import { IMAGE_PROVIDERS } from './providers/utils';
-import { rpcError, rpcSuccess } from './utils';
+import uploadToProviders from '../providers/';
+import { IMAGE_PROVIDERS } from '../providers/utils';
+import { rpcError, rpcSuccess } from '../utils';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
 export const MAX_IMAGE_DIMENSION = 1500;
