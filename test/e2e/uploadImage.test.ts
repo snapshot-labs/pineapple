@@ -84,9 +84,14 @@ describe('POST /upload', () => {
 
         // Step 3: Verify content format and processing
         const imageBuffer = await gatewayResponse.buffer();
+        const originalMetadata = await sharp(
+          path.join(__dirname, `./fixtures/${filename}`)
+        ).metadata();
         const metadata = await sharp(imageBuffer).metadata();
 
         expect(metadata.format).toBe('webp');
+        expect(metadata.width).toBe(originalMetadata.width);
+        expect(metadata.height).toBe(originalMetadata.height);
 
         // Step 4: Visual verification with snapshot testing
         const pngBuffer = await sharp(imageBuffer).png().toBuffer();
