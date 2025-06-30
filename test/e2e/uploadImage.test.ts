@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import sharp from 'sharp';
 import request from 'supertest';
 import { IMAGE_PROVIDERS } from '../../src/providers/utils';
-import { MAX_IMAGE_DIMENSION } from '../../src/upload';
+import { MAX_IMAGE_DIMENSION } from '../../src/routes/upload';
 
 // Helper function to validate CID format
 const isValidCid = (cid: string): boolean => {
