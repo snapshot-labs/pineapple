@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import request from 'supertest';
-import { JSON_PROVIDERS as IPFS_JSON_PROVIDERS } from '../../src/providers/ipfs/';
+import { JSON_PROVIDERS as IPFS_JSON_PROVIDERS } from '../../src/providers/ipfs';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
 
