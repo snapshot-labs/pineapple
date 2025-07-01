@@ -1,21 +1,32 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { providersMap } from './utils';
+import {
+  IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS,
+  JSON_PROVIDERS as IPFS_JSON_PROVIDERS
+} from './ipfs';
 import { countOpenProvidersRequest, providersUploadSize, timeProvidersUpload } from '../metrics';
-type ProviderType = 'image' | 'json';
 
-export default function uploadToProviders(providers: string[], type: ProviderType, params: any) {
-  const configuredProviders = providers.filter(p => providersMap[p].isConfigured());
+type ProviderType = 'image' | 'json';
+type Protocol = 'ipfs';
+
+const PROVIDERS = {
+  ipfs: {
+    image: IPFS_IMAGE_PROVIDERS,
+    json: IPFS_JSON_PROVIDERS
+  }
+};
+
+export default function uploadToProviders(protocol: Protocol, type: ProviderType, params: any) {
+  const configuredProviders = PROVIDERS[protocol][type].filter(p => p.isConfigured());
 
   return Promise.any(
-    configuredProviders.map(async name => {
-      const type: ProviderType = params instanceof Buffer ? 'image' : 'json';
+    configuredProviders.map(async ({ provider: name, set }) => {
       const end = timeProvidersUpload.startTimer({ name, type });
       let status = 0;
 
       try {
         countOpenProvidersRequest.inc({ name, type });
 
-        const result = await providersMap[name].set(params);
+        const result = await set(params);
         const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
           .length;
         providersUploadSize.inc({ name, type }, size);

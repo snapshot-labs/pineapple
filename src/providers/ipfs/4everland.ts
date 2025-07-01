@@ -1,5 +1,5 @@
 import { S3 } from '@aws-sdk/client-s3';
-import { sha256 } from '../utils';
+import { sha256 } from '../../utils';
 
 const { EVER_API_KEY, EVER_API_SECRET } = process.env;
 
