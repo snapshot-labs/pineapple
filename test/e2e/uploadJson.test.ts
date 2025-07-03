@@ -1,8 +1,10 @@
 import fetch from 'node-fetch';
 import request from 'supertest';
-import { JSON_PROVIDERS } from '../../src/providers/utils';
+import { JSON_PROVIDERS as IPFS_JSON_PROVIDERS } from '../../src/providers/ipfs';
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
+
+const JSON_PROVIDER_NAMES = IPFS_JSON_PROVIDERS.map(p => p.provider);
 
 describe('POST / (JSON upload)', () => {
   describe('when the payload is valid', () => {
@@ -16,7 +18,7 @@ describe('POST / (JSON upload)', () => {
       expect(response.body.result.cid).toEqual(
         'bafkreihzrpqw5p5imhfttjq7v746kkzt6w6mc25wvzzookgse3oaocjzgi'
       );
-      expect(JSON_PROVIDERS).toContain(response.body.result.provider);
+      expect(JSON_PROVIDER_NAMES).toContain(response.body.result.provider);
 
       // Step 2: Verify IPFS gateway retrieval
       const gatewayUrl = `https://snapshot.4everland.link/ipfs/${response.body.result.cid}`;

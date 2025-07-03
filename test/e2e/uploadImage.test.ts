@@ -2,7 +2,7 @@ import path from 'path';
 import fetch from 'node-fetch';
 import sharp from 'sharp';
 import request from 'supertest';
-import { IMAGE_PROVIDERS } from '../../src/providers/utils';
+import { IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS } from '../../src/providers/ipfs';
 import { MAX_IMAGE_DIMENSION } from '../../src/routes/upload';
 
 // Helper function to validate CID format
@@ -16,6 +16,8 @@ const isValidCid = (cid: string): boolean => {
 };
 
 const HOST = `http://localhost:${process.env.PORT || 3003}`;
+
+const IMAGE_PROVIDER_NAMES = IPFS_IMAGE_PROVIDERS.map(p => p.provider);
 
 describe('POST /upload', () => {
   jest.retryTimes(2);
@@ -73,7 +75,7 @@ describe('POST /upload', () => {
         expect(response.statusCode).toBe(200);
         expect(response.body.jsonrpc).toBe('2.0');
         expect(isValidCid(response.body.result.cid)).toBe(true);
-        expect(IMAGE_PROVIDERS).toContain(response.body.result.provider);
+        expect(IMAGE_PROVIDER_NAMES).toContain(response.body.result.provider);
 
         // Step 2: Verify IPFS gateway retrieval
         const gatewayUrl = `https://snapshot.4everland.link/ipfs/${response.body.result.cid}`;
@@ -126,7 +128,7 @@ describe('POST /upload', () => {
       expect(response.statusCode).toBe(200);
       expect(response.body.jsonrpc).toBe('2.0');
       expect(isValidCid(response.body.result.cid)).toBe(true);
-      expect(IMAGE_PROVIDERS).toContain(response.body.result.provider);
+      expect(IMAGE_PROVIDER_NAMES).toContain(response.body.result.provider);
 
       // Step 2: Verify IPFS gateway retrieval
       const gatewayUrl = `https://snapshot.4everland.link/ipfs/${response.body.result.cid}`;

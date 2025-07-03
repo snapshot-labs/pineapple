@@ -2,7 +2,10 @@ import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express } from 'express';
 import gateways from './gateways.json';
-import { IMAGE_PROVIDERS, JSON_PROVIDERS, providersMap } from './providers/utils';
+import {
+  IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS,
+  JSON_PROVIDERS as IPFS_JSON_PROVIDERS
+} from './providers/ipfs';
 
 export default function initMetrics(app: Express) {
   init(app, {
@@ -24,13 +27,13 @@ const providersJsonCount = new client.Gauge({
   name: 'providers_json_count',
   help: 'Number of providers used for JSON pinning.'
 });
-providersJsonCount.set(JSON_PROVIDERS.filter(p => providersMap[p].isConfigured()).length);
+providersJsonCount.set(IPFS_JSON_PROVIDERS.filter(p => p.isConfigured()).length);
 
 const providersImageCount = new client.Gauge({
   name: 'providers_image_count',
   help: 'Number of providers used for image pinning.'
 });
-providersImageCount.set(IMAGE_PROVIDERS.filter(p => providersMap[p].isConfigured()).length);
+providersImageCount.set(IPFS_IMAGE_PROVIDERS.filter(p => p.isConfigured()).length);
 
 export const timeProvidersUpload = new client.Histogram({
   name: 'providers_upload_duration_seconds',
@@ -53,7 +56,7 @@ const providersReturnCount = new client.Counter({
 
 export const timeIpfsGatewaysResponse = new client.Histogram({
   name: 'ipfs_gateways_response_duration_seconds',
-  help: "Duration in seconds of each IPFS gateway's reponse.",
+  help: "Duration in seconds of each IPFS gateway's response.",
   labelNames: ['name', 'status'],
   buckets: [0.5, 1, 2, 5, 10, 15]
 });

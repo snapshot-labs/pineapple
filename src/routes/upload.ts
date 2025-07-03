@@ -4,7 +4,6 @@ import express from 'express';
 import multer from 'multer';
 import sharp from 'sharp';
 import uploadToProviders from '../providers/';
-import { IMAGE_PROVIDERS } from '../providers/utils';
 import { rpcError, rpcSuccess } from '../utils';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
@@ -36,7 +35,7 @@ router.post('/upload', async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await uploadToProviders(IMAGE_PROVIDERS, 'image', buffer);
+      const result = await uploadToProviders('ipfs', 'image', buffer);
       const file = {
         cid: result.cid,
         provider: result.provider
