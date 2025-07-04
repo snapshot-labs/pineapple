@@ -13,7 +13,7 @@ export default {
 
   preset: 'ts-jest',
   testEnvironment: 'node',
-  setupFiles: ['dotenv/config'],
+  setupFiles: ['<rootDir>/test/setup.ts'],
   setupFilesAfterEnv: ['<rootDir>/test/setup/jest-image-snapshot.ts'],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/'],
   moduleFileExtensions: ['js', 'ts'],

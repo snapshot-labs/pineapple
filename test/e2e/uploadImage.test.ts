@@ -4,6 +4,7 @@ import sharp from 'sharp';
 import request from 'supertest';
 import { IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS } from '../../src/providers/ipfs';
 import { MAX_IMAGE_DIMENSION } from '../../src/routes/upload';
+import { createApp } from '../helpers/app';
 
 // Helper function to validate CID format
 const isValidCid = (cid: string): boolean => {
@@ -15,15 +16,18 @@ const isValidCid = (cid: string): boolean => {
   return cidv0Pattern.test(cid) || cidv1Pattern.test(cid);
 };
 
-const HOST = `http://localhost:${process.env.PORT || 3003}`;
-
 const IMAGE_PROVIDER_NAMES = IPFS_IMAGE_PROVIDERS.map(p => p.provider);
 
 describe('POST /upload', () => {
+  let app: any;
+
+  beforeAll(() => {
+    app = createApp();
+  });
   jest.retryTimes(2);
   describe('when the image exceeds the maximum file size', () => {
     it('should return a 400 error', async () => {
-      const response = await request(HOST)
+      const response = await request(app)
         .post('/upload')
         .attach('file', path.join(__dirname, './fixtures/too-heavy.jpg'));
 
@@ -37,7 +41,7 @@ describe('POST /upload', () => {
       ['non-image file extension', 'file.json'],
       ['non-image impersonating image extension', 'json-file.png']
     ])('should return a 415 error on %s', async (_, filename) => {
-      const response = await request(HOST)
+      const response = await request(app)
         .post('/upload')
         .attach('file', path.join(__dirname, `./fixtures/${filename}`));
 
@@ -48,7 +52,7 @@ describe('POST /upload', () => {
 
   describe('when the file is missing', () => {
     it('should return a 400 error', async () => {
-      const response = await request(HOST).post('/upload');
+      const response = await request(app).post('/upload');
 
       expect(response.statusCode).toBe(400);
       expect(response.body.error.message).toBe('No file submitted');
@@ -67,7 +71,7 @@ describe('POST /upload', () => {
     it.each(supportedFormats)(
       'should successfully upload and convert $format to WebP with valid CID',
       async ({ filename }) => {
-        const response = await request(HOST)
+        const response = await request(app)
           .post('/upload')
           .attach('file', path.join(__dirname, `./fixtures/${filename}`));
 
@@ -108,7 +112,7 @@ describe('POST /upload', () => {
     );
 
     it('should return a 415 error for unsupported BMP format', async () => {
-      const response = await request(HOST)
+      const response = await request(app)
         .post('/upload')
         .attach('file', path.join(__dirname, './fixtures/valid.bmp'));
 
@@ -119,12 +123,11 @@ describe('POST /upload', () => {
 
   describe('when uploading large images', () => {
     it('should resize large images to max dimension with correct CID', async () => {
-      const response = await request(HOST)
+      const response = await request(app)
         .post('/upload')
         .attach('file', path.join(__dirname, './fixtures/large-image.jpg'));
 
       // Step 1: Verify API response
-      console.log('Upload response:', response.body);
       expect(response.statusCode).toBe(200);
       expect(response.body.jsonrpc).toBe('2.0');
       expect(isValidCid(response.body.result.cid)).toBe(true);

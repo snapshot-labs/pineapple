@@ -6,6 +6,9 @@ build
 coverage
 uploads
 
+# Test artifacts
+test/e2e/__image_snapshots__/__diff_output__/
+
 # Remove some common IDE working directories
 .idea
 .vscode
