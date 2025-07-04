@@ -1,16 +1,20 @@
 import fetch from 'node-fetch';
 import request from 'supertest';
 import { JSON_PROVIDERS as IPFS_JSON_PROVIDERS } from '../../src/providers/ipfs';
-
-const HOST = `http://localhost:${process.env.PORT || 3003}`;
+import { createApp } from '../helpers/app';
 
 const JSON_PROVIDER_NAMES = IPFS_JSON_PROVIDERS.map(p => p.provider);
 
 describe('POST / (JSON upload)', () => {
+  let app: any;
+
+  beforeAll(() => {
+    app = createApp();
+  });
   describe('when the payload is valid', () => {
     it('should successfully upload JSON and retrieve from IPFS with correct content', async () => {
       const originalPayload = { test: 'value' };
-      const response = await request(HOST).post('/').send({ params: originalPayload });
+      const response = await request(app).post('/').send({ params: originalPayload });
 
       // Step 1: Verify API response
       expect(response.statusCode).toBe(200);
@@ -35,14 +39,14 @@ describe('POST / (JSON upload)', () => {
 
   describe('when the payload is not valid', () => {
     it('should return a 400 error on malformed JSON', async () => {
-      const response = await request(HOST).post('/').send({ test: 'value' });
+      const response = await request(app).post('/').send({ test: 'value' });
 
       expect(response.statusCode).toBe(400);
       expect(response.body.error.message).toBe('Malformed body');
     });
 
     it('should return a 400 error on empty body', async () => {
-      const response = await request(HOST).post('/');
+      const response = await request(app).post('/');
 
       expect(response.statusCode).toBe(400);
       expect(response.body.error.message).toBe('Malformed body');
