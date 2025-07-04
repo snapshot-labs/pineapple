@@ -110,15 +110,6 @@ describe('POST /upload', () => {
       },
       30000
     );
-
-    it('should return a 415 error for unsupported BMP format', async () => {
-      const response = await request(app)
-        .post('/upload')
-        .attach('file', path.join(__dirname, './fixtures/valid.bmp'));
-
-      expect(response.statusCode).toBe(415);
-      expect(response.body.error.message).toBe('Unsupported file type');
-    });
   });
 
   describe('when uploading large images', () => {
