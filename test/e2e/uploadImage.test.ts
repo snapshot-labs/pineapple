@@ -124,7 +124,6 @@ describe('POST /upload', () => {
         .attach('file', path.join(__dirname, './fixtures/large-image.jpg'));
 
       // Step 1: Verify API response
-      console.log('Upload response:', response.body);
       expect(response.statusCode).toBe(200);
       expect(response.body.jsonrpc).toBe('2.0');
       expect(isValidCid(response.body.result.cid)).toBe(true);
