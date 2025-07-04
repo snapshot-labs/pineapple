@@ -5,16 +5,10 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     env:
-      FLEEK_API_KEY: ${{ secrets.FLEEK_API_KEY }}
-      FLEEK_API_SECRET: ${{ secrets.FLEEK_API_SECRET }}
-      INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
-      INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
-      PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
-      PINATA_API_SECRET: ${{ secrets.PINATA_API_SECRET }}
-      WEB3STORAGE_API_TOKEN: ${{ secrets.WEB3STORAGE_API_TOKEN }}
       EVER_API_KEY: ${{ secrets.EVER_API_KEY }}
       EVER_API_SECRET: ${{ secrets.EVER_API_SECRET }}
       EVER_BUCKET_NAME: ${{ secrets.EVER_BUCKET_NAME }}
+      SWARMY_API_KEY: ${{ secrets.SWARMY_API_KEY }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
