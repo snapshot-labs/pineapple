@@ -3,19 +3,39 @@ import {
   IMAGE_PROVIDERS as IPFS_IMAGE_PROVIDERS,
   JSON_PROVIDERS as IPFS_JSON_PROVIDERS
 } from './ipfs';
+import {
+  IMAGE_PROVIDERS as SWARM_IMAGE_PROVIDERS,
+  JSON_PROVIDERS as SWARM_JSON_PROVIDERS
+} from './swarm';
 import { countOpenProvidersRequest, providersUploadSize, timeProvidersUpload } from '../metrics';
 
 type ProviderType = 'image' | 'json';
-type Protocol = 'ipfs';
+type Protocol = 'ipfs' | 'swarm';
 
 const PROVIDERS = {
   ipfs: {
     image: IPFS_IMAGE_PROVIDERS,
     json: IPFS_JSON_PROVIDERS
+  },
+  swarm: {
+    image: SWARM_IMAGE_PROVIDERS,
+    json: SWARM_JSON_PROVIDERS
   }
-};
+} as const;
+
+export const DEFAULT_PROTOCOL: Protocol = 'ipfs';
 
 export default function uploadToProviders(protocol: Protocol, type: ProviderType, params: any) {
+  if (!PROVIDERS[protocol]) {
+    return Promise.reject(new Error(`Unsupported protocol: ${protocol}`));
+  }
+
+  if (!PROVIDERS[protocol][type]) {
+    return Promise.reject(
+      new Error(`Unsupported provider type: ${type} for protocol: ${protocol}`)
+    );
+  }
+
   const configuredProviders = PROVIDERS[protocol][type].filter(p => p.isConfigured());
 
   return Promise.any(
