@@ -27,13 +27,11 @@ export const DEFAULT_PROTOCOL: Protocol = 'ipfs';
 
 export default function uploadToProviders(protocol: Protocol, type: ProviderType, params: any) {
   if (!PROVIDERS[protocol]) {
-    return Promise.reject(new Error(`Unsupported protocol: ${protocol}`));
+    throw new Error(`Unsupported protocol: ${protocol}`);
   }
 
   if (!PROVIDERS[protocol][type]) {
-    return Promise.reject(
-      new Error(`Unsupported provider type: ${type} for protocol: ${protocol}`)
-    );
+    throw new Error(`Unsupported provider type: ${type} for protocol: ${protocol}`);
   }
 
   const configuredProviders = PROVIDERS[protocol][type].filter(p => p.isConfigured());

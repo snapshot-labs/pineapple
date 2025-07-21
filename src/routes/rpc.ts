@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
     return rpcSuccess(res, { ...result, size }, id);
   } catch (e: any) {
     capture(e);
-    return rpcError(res, 500, e, id);
+    return rpcError(res, 500, (e instanceof Error && e.message) || e, id);
   }
 });
 
