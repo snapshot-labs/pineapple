@@ -30,7 +30,7 @@ export default function uploadToProviders(protocol: Protocol, type: ProviderType
     throw new Error(`Unsupported protocol: ${protocol}`);
   }
 
-  if (!PROVIDERS[protocol][type]) {
+  if (!PROVIDERS[protocol][type]?.length) {
     throw new Error(`Unsupported provider type: ${type} for protocol: ${protocol}`);
   }
 
