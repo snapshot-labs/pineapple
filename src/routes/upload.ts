@@ -3,7 +3,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
 import multer from 'multer';
 import sharp from 'sharp';
-import uploadToProviders from '../providers/';
+import uploadToProviders, { DEFAULT_PROTOCOL } from '../providers/';
 import { rpcError, rpcSuccess } from '../utils';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
@@ -35,7 +35,11 @@ router.post('/upload', async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await uploadToProviders('ipfs', 'image', buffer);
+      const result = await uploadToProviders(
+        req.body?.protocol || DEFAULT_PROTOCOL,
+        'image',
+        buffer
+      );
       const file = {
         cid: result.cid,
         provider: result.provider
@@ -48,7 +52,7 @@ router.post('/upload', async (req, res) => {
       }
 
       capture(e);
-      return rpcError(res, 500, e);
+      return rpcError(res, 500, (e instanceof Error && e.message) || e);
     } finally {
       if (req.file) {
         await fs.promises.unlink(req.file.path as string);
