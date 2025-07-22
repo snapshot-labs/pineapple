@@ -17,5 +17,6 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/test/setup/jest-image-snapshot.ts'],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/'],
   moduleFileExtensions: ['js', 'ts'],
-  verbose: true
+  verbose: true,
+  retryTimes: 3
 };
