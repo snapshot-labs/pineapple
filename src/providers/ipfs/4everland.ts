@@ -13,6 +13,13 @@ const client = new S3({
   }
 });
 
+function extractBody(body: unknown): string | undefined {
+  if (typeof body === 'string') return body;
+  if (Buffer.isBuffer(body)) return body.toString('utf-8');
+  if (body instanceof Uint8Array) return Buffer.from(body).toString('utf-8');
+  return undefined;
+}
+
 // 4everland is S3-compatible but not real S3, so error responses are not
 // always valid XML. When the AWS SDK fails to deserialize an error body it
 // throws a generic "Cannot read properties of undefined (reading '#text')"
@@ -22,11 +29,14 @@ async function withResponseDetails<T>(op: string, run: () => Promise<T>): Promis
     return await run();
   } catch (err: any) {
     const status = err?.$response?.statusCode ?? err?.$metadata?.httpStatusCode;
-    const rawBody = err?.$response?.body?.toString?.('utf-8');
-    const detail = [status && `status=${status}`, rawBody && `body=${rawBody.slice(0, 500)}`]
-      .filter(Boolean)
-      .join(' ');
-    throw new Error(`4everland ${op} failed${detail ? `: ${detail}` : ''}`, { cause: err });
+    const rawBody = extractBody(err?.$response?.body);
+    const parts = [
+      status && `status=${status}`,
+      rawBody && `body=${rawBody.slice(0, 500)}`
+    ].filter(Boolean);
+    const fallback = err instanceof Error ? err.message : String(err);
+    const detail = parts.length ? parts.join(' ') : fallback;
+    throw new Error(`${provider} ${op} failed${detail ? `: ${detail}` : ''}`, { cause: err });
   }
 }
 
