@@ -30,10 +30,9 @@ async function withResponseDetails<T>(op: string, run: () => Promise<T>): Promis
   } catch (err: any) {
     const status = err?.$response?.statusCode ?? err?.$metadata?.httpStatusCode;
     const rawBody = extractBody(err?.$response?.body);
-    const parts = [
-      status && `status=${status}`,
-      rawBody && `body=${rawBody.slice(0, 500)}`
-    ].filter(Boolean);
+    const parts = [status && `status=${status}`, rawBody && `body=${rawBody.slice(0, 500)}`].filter(
+      Boolean
+    );
     const fallback = err instanceof Error ? err.message : String(err);
     const detail = parts.length ? parts.join(' ') : fallback;
     throw new Error(`${provider} ${op} failed${detail ? `: ${detail}` : ''}`, { cause: err });
