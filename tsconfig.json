@@ -14,5 +14,6 @@
     "inlineSources": true,
     "sourceRoot": "/",
     "typeRoots": ["./node_modules/@types", "./test/setup"]
-  }
+  },
+  "include": ["src/**/*"]
 }
