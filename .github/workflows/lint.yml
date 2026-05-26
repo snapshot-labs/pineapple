@@ -4,5 +4,10 @@ on: [push]
 
 jobs:
   lint:
+    strategy:
+      matrix:
+        target: ['22']
     uses: snapshot-labs/actions/.github/workflows/lint.yml@main
+    with:
+      target: ${{ matrix.target }}
     secrets: inherit
