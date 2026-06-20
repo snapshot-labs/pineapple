@@ -11,7 +11,12 @@ export function rpcSuccess(res: Response, result: any, id = '') {
   });
 }
 
-export function rpcError(res: Response, code: number, e: Error | string, id = null) {
+export function rpcError(
+  res: Response,
+  code: number,
+  e: Error | string,
+  id = null
+) {
   res.status(code).json({
     jsonrpc: '2.0',
     error: {

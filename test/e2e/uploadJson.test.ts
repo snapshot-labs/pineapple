@@ -6,7 +6,10 @@ import { createApp } from '../helpers/app';
 const IPFS_JSON_PROVIDER_NAMES = IPFS_JSON_PROVIDERS.map(p => p.provider);
 const SWARM_JSON_PROVIDER_NAMES = SWARM_JSON_PROVIDERS.map(p => p.provider);
 
-const JSON_PROVIDER_NAMES = [...IPFS_JSON_PROVIDER_NAMES, ...SWARM_JSON_PROVIDER_NAMES];
+const JSON_PROVIDER_NAMES = [
+  ...IPFS_JSON_PROVIDER_NAMES,
+  ...SWARM_JSON_PROVIDER_NAMES
+];
 
 describe('POST /', () => {
   let app: any;
@@ -95,7 +98,9 @@ describe('POST /', () => {
       });
 
       it('returns a 400 error on empty body', async () => {
-        const response = await request(app).post('/').send({ protocol: 'swarm' });
+        const response = await request(app)
+          .post('/')
+          .send({ protocol: 'swarm' });
 
         expect(response.statusCode).toBe(400);
         expect(response.body.error.message).toBe('Malformed body');

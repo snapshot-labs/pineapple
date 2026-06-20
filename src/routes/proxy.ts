@@ -51,7 +51,11 @@ router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', useProxyCache, async (req, res) => {
             return Promise.reject(response.status);
           }
 
-          if (!['text/plain', 'application/json'].includes(response.headers.get('content-type'))) {
+          if (
+            !['text/plain', 'application/json'].includes(
+              response.headers.get('content-type')
+            )
+          ) {
             return Promise.reject(UNSUPPORTED_FILE_TYPE);
           }
 
@@ -75,7 +79,9 @@ router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', useProxyCache, async (req, res) => {
     return res.json(result.json);
   } catch (e) {
     if (e instanceof AggregateError) {
-      return res.status(e.errors.includes(UNSUPPORTED_FILE_TYPE) ? 415 : 400).json();
+      return res
+        .status(e.errors.includes(UNSUPPORTED_FILE_TYPE) ? 415 : 400)
+        .json();
     }
 
     capture(e);

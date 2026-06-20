@@ -27,13 +27,17 @@ const providersJsonCount = new client.Gauge({
   name: 'providers_json_count',
   help: 'Number of providers used for JSON pinning.'
 });
-providersJsonCount.set(IPFS_JSON_PROVIDERS.filter(p => p.isConfigured()).length);
+providersJsonCount.set(
+  IPFS_JSON_PROVIDERS.filter(p => p.isConfigured()).length
+);
 
 const providersImageCount = new client.Gauge({
   name: 'providers_image_count',
   help: 'Number of providers used for image pinning.'
 });
-providersImageCount.set(IPFS_IMAGE_PROVIDERS.filter(p => p.isConfigured()).length);
+providersImageCount.set(
+  IPFS_IMAGE_PROVIDERS.filter(p => p.isConfigured()).length
+);
 
 export const timeProvidersUpload = new client.Histogram({
   name: 'providers_upload_duration_seconds',
@@ -106,7 +110,10 @@ const providersInstrumentation = (req, res, next) => {
   const oldJson = res.json;
   res.json = body => {
     if (res.statusCode === 200 && body) {
-      providersReturnCount.inc({ name: body.result?.provider || body.provider, type });
+      providersReturnCount.inc({
+        name: body.result?.provider || body.provider,
+        type
+      });
     }
 
     res.locals.body = body;
