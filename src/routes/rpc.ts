@@ -20,14 +20,14 @@ router.post('/', async (req, res) => {
     const result = await uploadToProviders(protocol, 'json', params);
     try {
       await setAws(result.cid, params);
-    } catch (e: any) {
-      capture(e);
+    } catch (err: any) {
+      capture(err);
     }
 
     return rpcSuccess(res, { ...result, size }, id);
-  } catch (e: any) {
-    capture(e);
-    return rpcError(res, 500, (e instanceof Error && e.message) || e, id);
+  } catch (err: any) {
+    capture(err);
+    return rpcError(res, 500, (err instanceof Error && err.message) || err, id);
   }
 });
 
