@@ -18,6 +18,20 @@ const isValidCid = (cid: string): boolean => {
 
 const IMAGE_PROVIDER_NAMES = IPFS_IMAGE_PROVIDERS.map(p => p.provider);
 
+// Image uploads go to the credential-gated 4everland IPFS provider. GitHub does
+// not expose repo secrets to Dependabot PRs, so the env vars are empty there and
+// these uploads fail with HTTP 500. Guard the upload blocks so they are skipped
+// (not failed) when the creds are absent, while still running on master.
+const hasIpfsCreds = Boolean(
+  process.env.EVER_API_KEY && process.env.EVER_API_SECRET
+);
+
+if (!hasIpfsCreds) {
+  console.warn(
+    'Skipping image upload e2e: EVER_API_KEY / EVER_API_SECRET not set'
+  );
+}
+
 describe('POST /upload', () => {
   let app: any;
 
@@ -59,21 +73,74 @@ describe('POST /upload', () => {
     });
   });
 
-  describe('when uploading image files', () => {
-    const supportedFormats = [
-      { format: 'PNG', filename: 'valid.png' },
-      { format: 'JPEG', filename: 'valid.jpg' },
-      { format: 'GIF', filename: 'valid.gif' },
-      { format: 'WebP', filename: 'valid.webp' },
-      { format: 'TIFF', filename: 'valid.tiff' }
-    ];
+  (hasIpfsCreds ? describe : describe.skip)(
+    'when uploading image files',
+    () => {
+      const supportedFormats = [
+        { format: 'PNG', filename: 'valid.png' },
+        { format: 'JPEG', filename: 'valid.jpg' },
+        { format: 'GIF', filename: 'valid.gif' },
+        { format: 'WebP', filename: 'valid.webp' },
+        { format: 'TIFF', filename: 'valid.tiff' }
+      ];
 
-    it.each(supportedFormats)(
-      'should successfully upload and convert $format to WebP with valid CID',
-      async ({ filename }) => {
+      it.each(supportedFormats)(
+        'should successfully upload and convert $format to WebP with valid CID',
+        async ({ filename }) => {
+          const response = await request(app)
+            .post('/upload')
+            .attach('file', path.join(__dirname, `./fixtures/${filename}`));
+
+          // Step 1: Verify API response
+          expect(response.statusCode).toBe(200);
+          expect(response.body.jsonrpc).toBe('2.0');
+          expect(isValidCid(response.body.result.cid)).toBe(true);
+          expect(IMAGE_PROVIDER_NAMES).toContain(response.body.result.provider);
+
+          // Step 2: Verify IPFS gateway retrieval
+          const gatewayUrl = `https://snapshot.4everland.link/ipfs/${response.body.result.cid}`;
+          const gatewayResponse = await fetch(gatewayUrl);
+
+          expect(gatewayResponse.ok).toBe(true);
+          expect(gatewayResponse.headers.get('content-type')).toMatch(
+            /^image\//
+          );
+
+          // Step 3: Verify content format and processing
+          const imageBuffer = await gatewayResponse.buffer();
+          const originalMetadata = await sharp(
+            path.join(__dirname, `./fixtures/${filename}`)
+          ).metadata();
+          const metadata = await sharp(imageBuffer).metadata();
+
+          expect(metadata.format).toBe('webp');
+          expect(metadata.width).toBe(originalMetadata.width);
+          expect(metadata.height).toBe(originalMetadata.height);
+
+          // Step 4: Visual verification with snapshot testing
+          const pngBuffer = await sharp(imageBuffer).png().toBuffer();
+          // @ts-expect-error - jest-image-snapshot types not properly configured
+          expect(pngBuffer).toMatchImageSnapshot({
+            customSnapshotIdentifier: `upload-${filename.replace(
+              /\./g,
+              '-'
+            )}-to-webp`,
+            failureThreshold: 0.01,
+            failureThresholdType: 'percent'
+          });
+        },
+        30000
+      );
+    }
+  );
+
+  (hasIpfsCreds ? describe : describe.skip)(
+    'when uploading large images',
+    () => {
+      it('should resize large images to max dimension with correct CID', async () => {
         const response = await request(app)
           .post('/upload')
-          .attach('file', path.join(__dirname, `./fixtures/${filename}`));
+          .attach('file', path.join(__dirname, './fixtures/large-image.jpg'));
 
         // Step 1: Verify API response
         expect(response.statusCode).toBe(200);
@@ -88,68 +155,23 @@ describe('POST /upload', () => {
         expect(gatewayResponse.ok).toBe(true);
         expect(gatewayResponse.headers.get('content-type')).toMatch(/^image\//);
 
-        // Step 3: Verify content format and processing
+        // Step 3: Verify content format and resize processing
         const imageBuffer = await gatewayResponse.buffer();
-        const originalMetadata = await sharp(
-          path.join(__dirname, `./fixtures/${filename}`)
-        ).metadata();
         const metadata = await sharp(imageBuffer).metadata();
 
         expect(metadata.format).toBe('webp');
-        expect(metadata.width).toBe(originalMetadata.width);
-        expect(metadata.height).toBe(originalMetadata.height);
+        expect(metadata.width).toBeLessThanOrEqual(MAX_IMAGE_DIMENSION);
+        expect(metadata.height).toBeLessThanOrEqual(MAX_IMAGE_DIMENSION);
 
         // Step 4: Visual verification with snapshot testing
         const pngBuffer = await sharp(imageBuffer).png().toBuffer();
         // @ts-expect-error - jest-image-snapshot types not properly configured
         expect(pngBuffer).toMatchImageSnapshot({
-          customSnapshotIdentifier: `upload-${filename.replace(
-            /\./g,
-            '-'
-          )}-to-webp`,
+          customSnapshotIdentifier: 'large-image-resized-to-webp',
           failureThreshold: 0.01,
           failureThresholdType: 'percent'
         });
-      },
-      30000
-    );
-  });
-
-  describe('when uploading large images', () => {
-    it('should resize large images to max dimension with correct CID', async () => {
-      const response = await request(app)
-        .post('/upload')
-        .attach('file', path.join(__dirname, './fixtures/large-image.jpg'));
-
-      // Step 1: Verify API response
-      expect(response.statusCode).toBe(200);
-      expect(response.body.jsonrpc).toBe('2.0');
-      expect(isValidCid(response.body.result.cid)).toBe(true);
-      expect(IMAGE_PROVIDER_NAMES).toContain(response.body.result.provider);
-
-      // Step 2: Verify IPFS gateway retrieval
-      const gatewayUrl = `https://snapshot.4everland.link/ipfs/${response.body.result.cid}`;
-      const gatewayResponse = await fetch(gatewayUrl);
-
-      expect(gatewayResponse.ok).toBe(true);
-      expect(gatewayResponse.headers.get('content-type')).toMatch(/^image\//);
-
-      // Step 3: Verify content format and resize processing
-      const imageBuffer = await gatewayResponse.buffer();
-      const metadata = await sharp(imageBuffer).metadata();
-
-      expect(metadata.format).toBe('webp');
-      expect(metadata.width).toBeLessThanOrEqual(MAX_IMAGE_DIMENSION);
-      expect(metadata.height).toBeLessThanOrEqual(MAX_IMAGE_DIMENSION);
-
-      // Step 4: Visual verification with snapshot testing
-      const pngBuffer = await sharp(imageBuffer).png().toBuffer();
-      // @ts-expect-error - jest-image-snapshot types not properly configured
-      expect(pngBuffer).toMatchImageSnapshot({
-        customSnapshotIdentifier: 'large-image-resized-to-webp',
-        failureThreshold: 0.01,
-        failureThresholdType: 'percent'
-      });
-    }, 30000);
-  });
+      }, 30000);
+    }
+  );
 });
