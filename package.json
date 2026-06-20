@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "lint:fix": "yarn lint --fix",
-    "lint": "eslint src/ test/ --ext .ts",
+    "lint:fix": "eslint . --fix",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
@@ -12,9 +12,6 @@
     "test": "jest",
     "test:e2e": "jest --collectCoverage=false test/e2e/",
     "test:e2e:update-snapshots": "jest --collectCoverage=false test/e2e/ --updateSnapshot"
-  },
-  "eslintConfig": {
-    "extends": "@snapshot-labs"
   },
   "prettier": "@snapshot-labs/prettier-config",
   "dependencies": {
@@ -37,14 +34,13 @@
     "web3.storage": "^4.2.0"
   },
   "devDependencies": {
-    "@snapshot-labs/eslint-config": "^0.1.0-beta.18",
+    "@snapshot-labs/eslint-config": "^0.1.1",
     "@snapshot-labs/prettier-config": "^0.1.0",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.3",
     "@types/multer": "^1.4.7",
     "@types/node": "^20.4.9",
-    "eslint": "^8.45.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint": "^9",
     "jest": "^29.6.2",
     "jest-image-snapshot": "^6.5.1",
     "prettier": "^3.0.1",

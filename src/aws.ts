@@ -25,9 +25,9 @@ export async function set(key, value) {
       Body: JSON.stringify(value),
       ContentType: 'application/json; charset=utf-8'
     });
-  } catch (e) {
-    console.log('Store cache failed', e);
-    throw e;
+  } catch (err) {
+    console.log('Store cache failed', err);
+    throw err;
   }
 }
 
@@ -40,7 +40,7 @@ export async function get(key) {
     });
     const str = await streamToString(Body);
     return JSON.parse(str);
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -52,7 +52,7 @@ export async function remove(key) {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: `public/${dir}/${key}`
     });
-  } catch (e: any) {
+  } catch {
     return false;
   }
 }

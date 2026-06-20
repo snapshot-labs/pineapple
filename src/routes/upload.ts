@@ -46,13 +46,13 @@ router.post('/upload', async (req, res) => {
       };
 
       return rpcSuccess(res, file);
-    } catch (e: any) {
-      if (e.message === 'Input buffer contains unsupported image format') {
+    } catch (err: any) {
+      if (err.message === 'Input buffer contains unsupported image format') {
         return rpcError(res, 415, 'Unsupported file type');
       }
 
-      capture(e);
-      return rpcError(res, 500, (e instanceof Error && e.message) || e);
+      capture(err);
+      return rpcError(res, 500, (err instanceof Error && err.message) || err);
     } finally {
       if (req.file) {
         await fs.promises.unlink(req.file.path as string);

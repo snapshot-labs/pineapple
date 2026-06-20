@@ -30,8 +30,8 @@ export default async function useProxyCache(req, res, next) {
           ipfsGatewaysCacheSize.inc({ status: 'MISS' }, size);
           await set(cid, body);
         }
-      } catch (e) {
-        capture(e);
+      } catch (err) {
+        capture(err);
       }
     }
 

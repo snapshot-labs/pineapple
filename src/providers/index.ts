@@ -68,33 +68,33 @@ export default async function uploadToProviders(
           console.log(`JSON pinned: ${result.provider} - ${result.cid}`);
 
           return result;
-        } catch (e: any) {
-          if (e instanceof Error) {
-            if (e.message !== 'Request timed out') {
-              capture(e, { name });
+        } catch (err: any) {
+          if (err instanceof Error) {
+            if (err.message !== 'Request timed out') {
+              capture(err, { name });
             }
           } else {
             capture(new Error(`Error from ${name} provider`), {
-              contexts: { provider_response: e }
+              contexts: { provider_response: err }
             });
           }
-          return Promise.reject(e);
+          return Promise.reject(err);
         } finally {
           end({ status });
           countOpenProvidersRequest.dec({ name, type });
         }
       })
     );
-  } catch (e: any) {
-    if (e instanceof AggregateError) {
+  } catch (err: any) {
+    if (err instanceof AggregateError) {
       if (configuredProviders.length === 1) {
-        throw e.errors[0];
+        throw err.errors[0];
       }
 
       throw new Error(
         `Unable to upload ${type} to ${protocol}: all providers failed`
       );
     }
-    throw e;
+    throw err;
   }
 }

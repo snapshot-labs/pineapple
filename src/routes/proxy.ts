@@ -28,7 +28,7 @@ async function getFileFromGraphIpfs(cid: string) {
       gateway: 'graph',
       json
     };
-  } catch (e) {
+  } catch {
     return Promise.reject(UNSUPPORTED_FILE_TYPE);
   }
 }
@@ -62,8 +62,8 @@ router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', useProxyCache, async (req, res) => {
           let json;
           try {
             json = await response.json();
-          } catch (e: any) {
-            return Promise.reject(e);
+          } catch (err: any) {
+            return Promise.reject(err);
           }
 
           status = 1;
@@ -77,14 +77,14 @@ router.get('^/ipfs/:cid([0-9a-zA-Z]+)$', useProxyCache, async (req, res) => {
     ipfsGatewaysReturnCount.inc({ name: result.gateway });
 
     return res.json(result.json);
-  } catch (e) {
-    if (e instanceof AggregateError) {
+  } catch (err) {
+    if (err instanceof AggregateError) {
       return res
-        .status(e.errors.includes(UNSUPPORTED_FILE_TYPE) ? 415 : 400)
+        .status(err.errors.includes(UNSUPPORTED_FILE_TYPE) ? 415 : 400)
         .json();
     }
 
-    capture(e);
+    capture(err);
     return res.status(500).json();
   }
 });
