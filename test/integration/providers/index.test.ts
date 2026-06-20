@@ -34,7 +34,9 @@ describe('providers', () => {
   }
 
   const providerPayload: { name: string; provider: any; idVersion: string }[] =
-    buildProviderPayload([Fleek, Pinata], 'v0').concat(buildProviderPayload([FourEverland], 'v1'));
+    buildProviderPayload([Fleek, Pinata], 'v0').concat(
+      buildProviderPayload([FourEverland], 'v1')
+    );
 
   describe.each(providerPayload)('$name', ({ name, provider, idVersion }) => {
     if (!provider.isConfigured()) {

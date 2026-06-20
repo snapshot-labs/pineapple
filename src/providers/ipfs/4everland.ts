@@ -24,18 +24,24 @@ function extractBody(body: unknown): string | undefined {
 // always valid XML. When the AWS SDK fails to deserialize an error body it
 // throws a generic "Cannot read properties of undefined (reading '#text')"
 // that hides the actual upstream status/body. Surface them here.
-async function withResponseDetails<T>(op: string, run: () => Promise<T>): Promise<T> {
+async function withResponseDetails<T>(
+  op: string,
+  run: () => Promise<T>
+): Promise<T> {
   try {
     return await run();
   } catch (err: any) {
     const status = err?.$response?.statusCode ?? err?.$metadata?.httpStatusCode;
     const rawBody = extractBody(err?.$response?.body);
-    const parts = [status && `status=${status}`, rawBody && `body=${rawBody.slice(0, 500)}`].filter(
-      Boolean
-    );
+    const parts = [
+      status && `status=${status}`,
+      rawBody && `body=${rawBody.slice(0, 500)}`
+    ].filter(Boolean);
     const fallback = err instanceof Error ? err.message : String(err);
     const detail = parts.length ? parts.join(' ') : fallback;
-    throw new Error(`${provider} ${op} failed${detail ? `: ${detail}` : ''}`, { cause: err });
+    throw new Error(`${provider} ${op} failed${detail ? `: ${detail}` : ''}`, {
+      cause: err
+    });
   }
 }
 
@@ -49,10 +55,13 @@ export async function set(data: Buffer | object) {
     client.putObject({
       ...params,
       Body: payload,
-      ContentType: data instanceof Buffer ? undefined : 'application/json; charset=utf-8'
+      ContentType:
+        data instanceof Buffer ? undefined : 'application/json; charset=utf-8'
     })
   );
-  const result = await withResponseDetails('headObject', () => client.headObject(params));
+  const result = await withResponseDetails('headObject', () =>
+    client.headObject(params)
+  );
   const cid = JSON.parse(result.ETag || 'null');
 
   return { cid, provider };

@@ -7,7 +7,11 @@ import {
   IMAGE_PROVIDERS as SWARM_IMAGE_PROVIDERS,
   JSON_PROVIDERS as SWARM_JSON_PROVIDERS
 } from './swarm';
-import { countOpenProvidersRequest, providersUploadSize, timeProvidersUpload } from '../metrics';
+import {
+  countOpenProvidersRequest,
+  providersUploadSize,
+  timeProvidersUpload
+} from '../metrics';
 
 type ProviderType = 'image' | 'json';
 type Protocol = 'ipfs' | 'swarm';
@@ -35,10 +39,14 @@ export default async function uploadToProviders(
   }
 
   if (!PROVIDERS[protocol][type]?.length) {
-    throw new Error(`Unsupported provider type: ${type} for protocol: ${protocol}`);
+    throw new Error(
+      `Unsupported provider type: ${type} for protocol: ${protocol}`
+    );
   }
 
-  const configuredProviders = PROVIDERS[protocol][type].filter(p => p.isConfigured());
+  const configuredProviders = PROVIDERS[protocol][type].filter(p =>
+    p.isConfigured()
+  );
 
   try {
     return await Promise.any(
@@ -50,8 +58,11 @@ export default async function uploadToProviders(
           countOpenProvidersRequest.inc({ name, type });
 
           const result = await set(params);
-          const size = (params instanceof Buffer ? params : Buffer.from(JSON.stringify(params)))
-            .length;
+          const size = (
+            params instanceof Buffer
+              ? params
+              : Buffer.from(JSON.stringify(params))
+          ).length;
           providersUploadSize.inc({ name, type }, size);
           status = 1;
           console.log(`JSON pinned: ${result.provider} - ${result.cid}`);
@@ -80,7 +91,9 @@ export default async function uploadToProviders(
         throw e.errors[0];
       }
 
-      throw new Error(`Unable to upload ${type} to ${protocol}: all providers failed`);
+      throw new Error(
+        `Unable to upload ${type} to ${protocol}: all providers failed`
+      );
     }
     throw e;
   }

@@ -103,7 +103,10 @@ describe('POST /upload', () => {
         const pngBuffer = await sharp(imageBuffer).png().toBuffer();
         // @ts-expect-error - jest-image-snapshot types not properly configured
         expect(pngBuffer).toMatchImageSnapshot({
-          customSnapshotIdentifier: `upload-${filename.replace(/\./g, '-')}-to-webp`,
+          customSnapshotIdentifier: `upload-${filename.replace(
+            /\./g,
+            '-'
+          )}-to-webp`,
           failureThreshold: 0.01,
           failureThresholdType: 'percent'
         });

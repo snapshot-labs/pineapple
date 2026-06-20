@@ -1,13 +1,13 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     allow:
       # Allow updates for snapshot.js only
-      - dependency-name: "@snapshot-labs/*"
+      - dependency-name: '@snapshot-labs/*'
     groups:
       snapshot:
         patterns:
-          - "@snapshot-labs/*"
+          - '@snapshot-labs/*'

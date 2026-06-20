@@ -27,7 +27,9 @@ describe('GET /ipfs/:cid', () => {
 
           expect(response.body).toEqual(cachedContent);
           expect(response.statusCode).toBe(200);
-          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+          expect(response.headers['content-type']).toBe(
+            'application/json; charset=utf-8'
+          );
           expect(await get(cid)).toEqual(cachedContent);
         });
       } else {
@@ -42,7 +44,9 @@ describe('GET /ipfs/:cid', () => {
 
           expect(response.body).toEqual(content);
           expect(response.statusCode).toBe(200);
-          expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
+          expect(response.headers['content-type']).toBe(
+            'application/json; charset=utf-8'
+          );
           expect(await get(cid)).toEqual(response.body);
         });
       } else {

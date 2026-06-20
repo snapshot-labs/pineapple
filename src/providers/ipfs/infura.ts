@@ -9,9 +9,9 @@ const client = create({
   protocol: 'https',
   timeout: 10e3,
   headers: {
-    authorization: `Basic ${Buffer.from(`${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`).toString(
-      'base64'
-    )}`
+    authorization: `Basic ${Buffer.from(
+      `${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`
+    ).toString('base64')}`
   }
 });
 
