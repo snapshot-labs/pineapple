@@ -107,4 +107,15 @@ describe('POST /', () => {
       });
     });
   });
+
+  describe('unsupported protocol', () => {
+    it('returns a 400 error', async () => {
+      const response = await request(app)
+        .post('/')
+        .send({ params: { status: 'OK' }, protocol: 'invalid' });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.error.message).toBe('Unsupported protocol: invalid');
+    });
+  });
 });

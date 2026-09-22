@@ -3,7 +3,10 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
 import multer from 'multer';
 import sharp from 'sharp';
-import uploadToProviders, { DEFAULT_PROTOCOL } from '../providers/';
+import uploadToProviders, {
+  DEFAULT_PROTOCOL,
+  isSupported
+} from '../providers/';
 import { rpcError, rpcSuccess } from '../utils';
 
 const MAX_INPUT_SIZE = 1024 * 1024;
@@ -21,6 +24,11 @@ router.post('/upload', async (req, res) => {
       if (err) return rpcError(res, 400, err.message);
       if (!req.file) return rpcError(res, 400, 'No file submitted');
 
+      const protocol = req.body?.protocol || DEFAULT_PROTOCOL;
+      if (!isSupported(protocol, 'image')) {
+        return rpcError(res, 400, `Unsupported protocol: ${protocol}`);
+      }
+
       const transformer = sharp()
         .resize({
           width: MAX_IMAGE_DIMENSION,
@@ -35,11 +43,7 @@ router.post('/upload', async (req, res) => {
         .pipe(transformer)
         .toBuffer();
 
-      const result = await uploadToProviders(
-        req.body?.protocol || DEFAULT_PROTOCOL,
-        'image',
-        buffer
-      );
+      const result = await uploadToProviders(protocol, 'image', buffer);
       const file = {
         cid: result.cid,
         provider: result.provider

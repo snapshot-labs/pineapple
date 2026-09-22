@@ -59,6 +59,18 @@ describe('POST /upload', () => {
     });
   });
 
+  describe('when the protocol is unsupported', () => {
+    it('should return a 400 error', async () => {
+      const response = await request(app)
+        .post('/upload')
+        .field('protocol', 'swarm')
+        .attach('file', path.join(__dirname, './fixtures/valid.png'));
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.error.message).toBe('Unsupported protocol: swarm');
+    });
+  });
+
   describe('when uploading image files', () => {
     const supportedFormats = [
       { format: 'PNG', filename: 'valid.png' },

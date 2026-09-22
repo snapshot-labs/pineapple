@@ -1,7 +1,10 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
 import { set as setAws } from '../aws';
-import uploadToProviders, { DEFAULT_PROTOCOL } from '../providers/';
+import uploadToProviders, {
+  DEFAULT_PROTOCOL,
+  isSupported
+} from '../providers/';
 import { MAX, rpcError, rpcSuccess } from '../utils';
 
 const router = express.Router();
@@ -11,6 +14,10 @@ router.post('/', async (req, res) => {
 
   if (!params) {
     return rpcError(res, 400, 'Malformed body', id);
+  }
+
+  if (!isSupported(protocol, 'json')) {
+    return rpcError(res, 400, `Unsupported protocol: ${protocol}`, id);
   }
 
   try {

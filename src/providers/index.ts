@@ -29,6 +29,13 @@ const PROVIDERS = {
 
 export const DEFAULT_PROTOCOL: Protocol = 'ipfs';
 
+export function isSupported(
+  protocol: string,
+  type: ProviderType
+): protocol is Protocol {
+  return !!PROVIDERS[protocol as Protocol]?.[type]?.length;
+}
+
 export default async function uploadToProviders(
   protocol: Protocol,
   type: ProviderType,
